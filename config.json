@@ -1,0 +1,70 @@
+[
+    {
+        "class": "course",
+        "id": "CMN 200",
+        "name": "The Craft of Professional Writing",
+        "description": "Some description",
+        "link": "https://www.ryerson.ca/procom/",
+        "year": 1,
+        "type": "Program Requirement",
+        "prereq": [] 
+    },
+    {
+        "class": "course",
+        "id": "CMN 215",
+        "name": "Messages, Modalities, and Media",
+        "description": "Some description",
+        "link": "https://www.ryerson.ca/procom/",
+        "year": 2,
+        "type": "Program Requirement",
+        "prereq": ["CMN 200"] 
+    },
+    {
+        "class": "course",
+        "id": "Open Elective",
+        "description": "Some description",
+        "link": "https://www.ryerson.ca/procom/",
+        "year": 1,
+        "type": "Electives",
+        "prereq": [],
+        "number": 3
+    },
+    {
+        "class": "course",
+        "id": "Liberal Studies - Table A",
+        "description": "Some description",
+        "link": "https://www.ryerson.ca/procom/",
+        "year": 1,
+        "type": "Liberal Studies",
+        "prereq": [],
+        "number": 3
+    },
+    {
+        "class": "course",
+        "id": "Professional Table I",
+        "description": "Some description",
+        "link": "https://www.ryerson.ca/procom/",
+        "year": 1,
+        "type": "Professional Table",
+        "prereq": [],
+        "number": 1
+    },
+    {
+        "class": "course",
+        "id": "Professional Table I",
+        "description": "Some description",
+        "link": "https://www.ryerson.ca/procom/",
+        "year": 2,
+        "type": "Professional Table",
+        "prereq": [],
+        "number": 2
+    },
+    {
+        "class": "help",
+        "id": "click",
+        "name": "Click on the courses to see details",
+        "description": "Sample description",
+        "type": "pop_up",
+        "year": 1
+    }
+]
