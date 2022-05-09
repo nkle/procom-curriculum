@@ -4,6 +4,7 @@ import pygame.math
 import pygame.display
 import os
 from pygame.locals import *
+import elements.static
 from itertools import cycle
 
 
@@ -14,7 +15,7 @@ class Player(pygame.sprite.Sprite):
     ACC = 0.5
     FRIC = -0.12
 
-    def __init__(self):
+    def __init__(self, pos):
         super().__init__()
         self._vec = pygame.math.Vector2
         # self.surf = pygame.Surface((30, 30))
@@ -33,11 +34,13 @@ class Player(pygame.sprite.Sprite):
 
         sr = pygame.display.get_surface().get_rect().size
 
-        self.pos = self._vec((sr[0] / 2, sr[1] - 30))
+        pos = pos or (sr[0] / 2, sr[1] * 5 / 7)
+
+        self.pos = self._vec(pos)
         self.vel = self._vec(0, 0)
         self.acc = self._vec(0, 0)
 
-    def move(self, dt, frame_num):
+    def update(self, dt, frame_num, sprites):
         self.acc = self._vec(0, 0)
 
         pressed_keys = pygame.key.get_pressed()
@@ -53,11 +56,25 @@ class Player(pygame.sprite.Sprite):
         elif pressed_keys[K_UP]:
             if frame_num % 10 == 0:
                 self.image = pygame.image.load(next(self._back)).convert_alpha()
+            for sprite in sprites:
+                if not isinstance(sprite, elements.static.Ladder):
+                    continue
+                if pygame.sprite.collide_rect(self, sprite):
+                    self.acc.y = -Player.ACC
+        elif pressed_keys[K_DOWN]:
+            if frame_num % 10 == 0:
+                self.image = pygame.image.load(next(self._back)).convert_alpha()
+            for sprite in sprites:
+                if not isinstance(sprite, elements.static.Ladder):
+                    continue
+                if pygame.sprite.collide_rect(self, sprite):
+                    self.acc.y = Player.ACC
         else:
             if frame_num % 10 == 0:
                 self.image = pygame.image.load(next(self._front)).convert_alpha()
 
         self.acc.x += self.vel.x * Player.FRIC
+        self.acc.y += self.vel.y * Player.FRIC
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
 

@@ -1,12 +1,15 @@
-import sys
 import pygame
-from pygame.locals import *
-from player.sam import Player
-from world.platform import Platform
+from elements.sam import Player
+from elements.static import PlatformTile
 from world.state import *
+import sys
+import json
 
 
-def run_game():
+def run_game(config):
+    with open(config, "r") as f:
+        config = json.load(f)
+
     pygame.init()
     pygame.display.set_caption("ProCom Curriculum")
 
@@ -14,22 +17,10 @@ def run_game():
     fps_clock = pygame.time.Clock()
 
     # Set up the window.
-    resolution = (800, 600)
+    resolution = (1200, 900)
     screen = pygame.display.set_mode(resolution)
 
-    # Load starting sprites
-    sprites = {
-        "player": pygame.sprite.Group(),
-        "platform": pygame.sprite.Group()
-    }
-
-    P1 = Player()
-    PT1 = Platform()
-
-    sprites["player"].add(P1)
-    sprites["platform"].add(PT1)
-
-    state_handler = StateHandler()
+    state_handler = StateHandler(config=config)
     state_handler.fade_in()
 
     dt = 1 / fps
@@ -45,5 +36,5 @@ def run_game():
 
 
 if __name__ == "__main__":
-    run_game()
+    run_game(sys.argv[1])
 
