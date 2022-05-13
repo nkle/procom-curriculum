@@ -9,6 +9,13 @@ import random
 from collections import defaultdict
 import colour
 from functools import reduce
+import os
+from itertools import cycle
+from random import randrange
+
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+WORLD_ASSETS_DIR = os.path.join(DIR_PATH, '..', 'assets', 'world')
 
 
 class WorldState(object):
@@ -72,6 +79,7 @@ class StartMenu(WorldState):
 class Game(WorldState):
     def __init__(self, *args, **kwargs):
         super(Game, self).__init__(*args, **kwargs)
+
         self._build_world(kwargs["config"])
 
     @staticmethod
@@ -84,30 +92,45 @@ class Game(WorldState):
         return repack_config
 
     def _build_world(self, config):
+        sr = pygame.display.get_surface().get_rect().size
+        level_zero = ((sr[1] * 5) // 8) + 30
+        self._levels = {i: level_zero - 105 * i for i in range(1, 5)}
+        self._levels[0] = level_zero
+
         repack_config = self._repackage_config(config)
 
         sr = pygame.display.get_surface().get_rect().size
 
         # Create player
-        sam_pos = (sr[0] / 2, sr[1] * 5 / 7)
+        sam_pos = (sr[0] / 2, ((sr[1] * 5) // 8) + 30)
         player_1 = elements.sam.Player(pos=sam_pos)
         self._sprite_group.add(player_1)
 
         # Create platforms
-        pt_size = (30, 30)
-        lad_size = (30, 60)
+        pt_size = (20, 20)
+        lad_size = (20, 100)
         sr = pygame.display.get_surface().get_rect().size
 
         max_years = 5
 
+        course_space_multiplier = 4
+
         # Make ground floor
-        for j in range(0, sr[0],  pt_size[0]):
-            pt = elements.static.PlatformTile(pos=(j, (sr[1] * 5) // 7), size=pt_size)
+        floor_block_pos = list(range(0, sr[0],  pt_size[0]))
+        for j in floor_block_pos:
+            if j == floor_block_pos[0]:
+                tile_type = elements.static.PlatformTile.TYPE_LEFT
+            elif j == floor_block_pos[-1]:
+                tile_type = elements.static.PlatformTile.TYPE_RIGHT
+            else:
+                tile_type = elements.static.PlatformTile.TYPE_MIDDLE
+
+            pt = elements.static.PlatformTile(pos=(j, self._levels[0]), size=pt_size, tile_type=tile_type)
             self._sprite_group.add(pt)
 
-        all_types = set(
+        all_types = list(set(
             course_type for course_types in repack_config["course"].values() for course_type in course_types
-        )
+        ))
 
         sizes_by_type = {
             element_type: max(
@@ -116,25 +139,83 @@ class Game(WorldState):
                      + reduce(lambda a, b: a + b, [course.get("number") or 0 for course in courses_by_type.get(element_type) or []], 0)
                 )
                 for courses_by_type in repack_config["course"].values()
-            ) * 2
+            ) * course_space_multiplier
             for element_type in all_types
         }
 
         block_pos = list(range(30, sr[0] - 30,  pt_size[0]))
         blocks_needed = reduce(lambda a, b: a + b, [size for size in sizes_by_type.values()])
         free_blocks = len(block_pos) - blocks_needed
+        free_blocks_per_type = free_blocks // len(all_types)
+        extra_blocks = free_blocks % len(all_types)
 
-        screen_sections_by_type = dict()
+        self._screen_sections_by_type = dict()
         cur_start = 0
         for course_type in all_types:
             num_blocks = sizes_by_type[course_type]
 
-            screen_sections_by_type[course_type] = block_pos[cur_start:
-                                                             cur_start + num_blocks + free_blocks // len(all_types)]
+            if course_type == all_types[-1]:
+                used_extra_blocks = extra_blocks
+            else:
+                used_extra_blocks = randrange(0, extra_blocks)
 
-        levels_by_type = defaultdict(list)
+            extra_blocks -= used_extra_blocks
 
-        for i in range(1, max_years):
+            cur_end = cur_start + num_blocks + used_extra_blocks + free_blocks_per_type
+            self._screen_sections_by_type[course_type] = block_pos[cur_start: cur_end]
+
+            cur_start = cur_end + 1
+
+        self._platform_locations_per_year = defaultdict(lambda: defaultdict(list))
+        self._connections_by_year = defaultdict(lambda: defaultdict(dict))
+
+        for i in self._levels.keys():
+            for course_type in all_types:
+                courses = repack_config["course"][i].get(course_type, list())
+
+                if not courses:
+                    continue
+
+                if i == 1:
+                    # Add label
+                    pass
+
+                cur_blocks_needed = len(courses) * course_space_multiplier
+                block_pos_needed = self._connections_by_year[i - 1].get(course_type)
+
+                cur_start = randrange(0, len(self._screen_sections_by_type[course_type]) - cur_blocks_needed)
+                cur_end = cur_start + cur_blocks_needed + 1
+
+                try:
+                    cur_end += randrange(0, len(self._screen_sections_by_type[course_type]) - cur_end)
+                except ValueError:
+                    pass
+
+                if block_pos_needed is not None:
+                    while block_pos_needed not in self._screen_sections_by_type[course_type][cur_start: cur_end]:
+                        cur_start = randrange(0, len(self._screen_sections_by_type[course_type]) - cur_blocks_needed)
+                        cur_end = cur_start + cur_blocks_needed + 1
+
+                        try:
+                            cur_end += randrange(0, len(self._screen_sections_by_type[course_type]) - cur_end)
+                        except ValueError:
+                            pass
+
+                for j in self._screen_sections_by_type[course_type][cur_start: cur_end]:
+                    self._platform_locations_per_year[i][course_type].append(j)
+                    pt = elements.static.PlatformTile(pos=(j, ((sr[1] * 5) // 8) + 30 - 105 * i), size=pt_size)
+                    self._sprite_group.add(pt)
+
+                self._connections_by_year[i][course_type] = self._screen_sections_by_type[course_type][randrange(cur_start, cur_end)]
+
+                if block_pos_needed is None:
+                    block_pos_needed = self._platform_locations_per_year[i][course_type][randrange(
+                        0, len(self._platform_locations_per_year[i][course_type])
+                    )]
+
+                lad = elements.static.Ladder(pos=(block_pos_needed, self._levels[i - 1] - lad_size[1]), size=lad_size)
+                self._sprite_group.add(lad)
+
             courses_by_types = repack_config["courses"].get(i) or {}
             prev_courses_by_types = repack_config["courses"].get(i - 1) or {}
 
@@ -143,9 +224,9 @@ class Game(WorldState):
             # for type, courses in courses_by_types.items():
             #     if prev_keys_by_type.get(type) is None:
 
-            for j in list(range(30, sr[0] - 30,  pt_size[0])):
-                pt = elements.static.PlatformTile(pos=(j, (sr[1] * (5 - i)) // 7), size=pt_size)
-                self._sprite_group.add(pt)
+            # for j in list(range(30, sr[0] - 30,  pt_size[0])):
+            #     pt = elements.static.PlatformTile(pos=(j, ((sr[1] * 5) // 8) + 30 - 105 * i), size=pt_size)
+            #     self._sprite_group.add(pt)
 
             # if i % 4 == 0:
             #     lad = elements.static.Ladder(pos=(i, (sr[1] * 5) // 7 - lad_size[1]), size=lad_size)
@@ -159,7 +240,12 @@ class Game(WorldState):
         self._sprite_group.update(dt, frame_num, self._sprite_group.sprites())
 
     def draw(self, screen):
-        screen.fill(WorldState.BLUE)
+        sr = pygame.display.get_surface().get_rect().size
+        bg = pygame.image.load(os.path.join(WORLD_ASSETS_DIR, "bg.jpg"))
+        bg = pygame.transform.scale(bg, sr)
+        screen.blit(bg, (0, 0))
+
+        # screen.fill(WorldState.BLUE)
         self._sprite_group.draw(screen)
 
 

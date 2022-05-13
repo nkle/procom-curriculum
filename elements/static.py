@@ -6,14 +6,20 @@ import pygame.display
 import os
 from pygame.locals import *
 from itertools import cycle
+from random import randrange
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 WORLD_ASSETS_DIR = os.path.join(DIR_PATH, '..', 'assets', 'world')
 
 
 class PlatformTile(pygame.sprite.Sprite):
-    def __init__(self, pos=None, size=None):
+    TYPE_MIDDLE="middle"
+    TYPE_LEFT="left"
+    TYPE_RIGHT="right"
+
+    def __init__(self, pos=None, size=None, tile_type=None):
         super().__init__()
+        tile_type = tile_type or PlatformTile.TYPE_MIDDLE
         self._vec = pygame.math.Vector2
 
         # self.surf = pygame.Surface((600, 20))
@@ -22,7 +28,9 @@ class PlatformTile(pygame.sprite.Sprite):
 
         size = size or (30, 30)
 
-        image = pygame.image.load(os.path.join(WORLD_ASSETS_DIR, "ground.png")).convert_alpha()
+        tile_img_path = os.path.join(WORLD_ASSETS_DIR, "tile_%s.jpg" % tile_type)
+
+        image = pygame.image.load(tile_img_path).convert_alpha()
         image = pygame.transform.scale(image, size)
         self.image = image
         self.rect = self.image.get_rect()
