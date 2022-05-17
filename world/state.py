@@ -1,3 +1,4 @@
+from __future__ import division
 import pygame.font
 import pygame.sprite
 import pygame.display
@@ -10,6 +11,7 @@ from collections import defaultdict
 import colour
 from functools import reduce
 import os
+from math import floor
 from itertools import cycle
 from random import randrange
 
@@ -80,7 +82,14 @@ class Game(WorldState):
     def __init__(self, *args, **kwargs):
         super(Game, self).__init__(*args, **kwargs)
         self._levels = dict()
+
+        # Grid at the bottom w/ x, y as keys
+        self._bottom_grid = defaultdict(lambda: defaultdict(lambda: None))
+        self._rows = 5
+        self._columns = 8
+
         self._build_world(kwargs["config"])
+        self._courses_taken = list()
 
     @property
     def levels(self):
@@ -108,18 +117,23 @@ class Game(WorldState):
         # Create platforms
         pt_size = (20, 20)
         lad_size = (20, 120)
+        chest_size = (25, 25)
         sr = pygame.display.get_surface().get_rect().size
 
         max_years = 5
 
-        course_space_multiplier = 4
+        course_space_multiplier = 3
 
         # Make ground floor
         floor_block_pos = list(range(0, sr[0],  pt_size[0]))
-        for j in floor_block_pos:
-            if j == floor_block_pos[0]:
+        for tile_num, j in enumerate(floor_block_pos):
+            # if j == floor_block_pos[0]:
+            #     tile_type = elements.static.PlatformTile.TYPE_LEFT
+            # elif j == floor_block_pos[-1]:
+            #     tile_type = elements.static.PlatformTile.TYPE_RIGHT
+            if tile_num % 3 == 0:
                 tile_type = elements.static.PlatformTile.TYPE_LEFT
-            elif j == floor_block_pos[-1]:
+            elif tile_num % 3 == 2:
                 tile_type = elements.static.PlatformTile.TYPE_RIGHT
             else:
                 tile_type = elements.static.PlatformTile.TYPE_MIDDLE
@@ -168,17 +182,18 @@ class Game(WorldState):
         self._platform_locations_per_year = defaultdict(lambda: defaultdict(list))
         self._connections_by_year = defaultdict(lambda: defaultdict(dict))
         course_type_title = dict()
+        chests = list()
 
         for i in self._levels.keys():
             for course_type in all_types:
-                courses = repack_config["course"][i].get(course_type, list())
+                # Unpack courses
+                courses = reduce(lambda a, b: a + b, [
+                    [course for _ in range(0, course.get("number", 1))]
+                    for course in repack_config["course"][i].get(course_type, list())
+                ], list())
 
                 if not courses:
                     continue
-
-                if i == 1:
-                    # Add label
-                    pass
 
                 cur_blocks_needed = len(courses) * course_space_multiplier
 
@@ -194,30 +209,48 @@ class Game(WorldState):
                     cur_start = randrange(0, len(self._screen_sections_by_type[course_type]) - cur_blocks_needed)
                 except ValueError:
                     cur_start = 0
-                cur_end = cur_start + cur_blocks_needed + 1
+                cur_end = cur_start + cur_blocks_needed
 
-                try:
-                    cur_end += randrange(0, len(self._screen_sections_by_type[course_type]) - cur_end)
-                except ValueError:
-                    pass
+                # Add extra blocks
+                # try:
+                #     cur_end += randrange(0, len(self._screen_sections_by_type[course_type]) - cur_end)
+                # except ValueError:
+                #     pass
 
                 if block_pos_needed is not None:
                     while block_pos_needed not in self._screen_sections_by_type[course_type][cur_start: cur_end]:
                         cur_start = randrange(0, len(self._screen_sections_by_type[course_type]) - cur_blocks_needed)
-                        cur_end = cur_start + cur_blocks_needed + 1
+                        cur_end = cur_start + cur_blocks_needed
 
-                        try:
-                            cur_end += randrange(0, len(self._screen_sections_by_type[course_type]) - cur_end)
-                        except ValueError:
-                            pass
+                        # Add extra blocks
+                        # try:
+                        #     cur_end += randrange(0, len(self._screen_sections_by_type[course_type]) - cur_end)
+                        # except ValueError:
+                        #     pass
 
-                for j in self._screen_sections_by_type[course_type][cur_start: cur_end]:
-                    if j == self._screen_sections_by_type[course_type][cur_start: cur_end][0]:
-                        tile_type = "left"
-                    elif j == self._screen_sections_by_type[course_type][cur_start: cur_end][-1]:
-                        tile_type = "right"
+                for tile_num, j in enumerate(self._screen_sections_by_type[course_type][cur_start: cur_end]):
+                    # if j == self._screen_sections_by_type[course_type][cur_start: cur_end][0]:
+                    #     tile_type = "left"
+                    # elif j == self._screen_sections_by_type[course_type][cur_start: cur_end][-1]:
+                    #     tile_type = "right"
+                    if tile_num % 3 == 0:
+                        tile_type = elements.static.PlatformTile.TYPE_LEFT
+                    elif tile_num % 3 == 2:
+                        tile_type = elements.static.PlatformTile.TYPE_RIGHT
                     else:
-                        tile_type = "middle"
+                        tile_type = elements.static.PlatformTile.TYPE_MIDDLE
+
+                        # Create course chest
+                        course_info = courses.pop()
+                        chests.append(
+                            elements.static.CourseChest(pos=(j, ((sr[1] * 5) // 8) + 10 - 105 * i), size=chest_size,
+                                                        course_id=course_info.get("id"),
+                                                        requirements=course_info.get("prereq"))
+                        )
+                        chests.append(
+                            elements.static.CourseTitle(pos=(j, ((sr[1] * 5) // 8) + 10 - 105 * i),
+                                                        course_id=course_info.get("id"))
+                        )
 
                     self._platform_locations_per_year[i][course_type].append(j)
                     pt = elements.static.PlatformTile(pos=(j, ((sr[1] * 5) // 8) + 30 - 105 * i),
@@ -250,7 +283,7 @@ class Game(WorldState):
                         len(self._platform_locations_per_year[i][course_type]) // 2
                                 ], self._levels[i])
 
-                    course_title = elements.static.CourseTitle(course_title=course_type, pos=text_pos)
+                    course_title = elements.static.CourseTypeTitle(course_type=course_type, pos=text_pos)
                     # self._sprite_group.add(course_title)
 
                     course_type_title[course_type] = course_title
@@ -261,30 +294,43 @@ class Game(WorldState):
         for course_title in course_type_title.values():
             self._sprite_group.add(course_title)
 
+        for chest in chests:
+            self._sprite_group.add(chest)
+
+        # Create bottom grid coordinates
+        self._grid_coordinates = [(floor(sr[0] * x / (self._columns + 2)),
+                                   floor((sr[1] * 5 / 8) + (sr[1] * 4 / 8) * y / (self._rows + 2)))
+                                  for x in range(1, self._columns + 1)
+                                  for y in range(1, self._rows + 1)]
+
         # Create player
         sam_pos = (sr[0] / 2, ((sr[1] * 5) // 8) + 30)
-        player_1 = elements.sam.Player(pos=sam_pos)
-        self._sprite_group.add(player_1)
-
-            # block_pos = list(range(30, sr[0] - 30,  pt_size[0]))
-            #
-            # for type, courses in courses_by_types.items():
-            #     if prev_keys_by_type.get(type) is None:
-
-            # for j in list(range(30, sr[0] - 30,  pt_size[0])):
-            #     pt = elements.static.PlatformTile(pos=(j, ((sr[1] * 5) // 8) + 30 - 105 * i), size=pt_size)
-            #     self._sprite_group.add(pt)
-
-            # if i % 4 == 0:
-            #     lad = elements.static.Ladder(pos=(i, (sr[1] * 5) // 7 - lad_size[1]), size=lad_size)
-            #     self._sprite_group.add(lad)
-
-        # Create ladders
-
-        pass
+        self._player = elements.sam.Player(pos=sam_pos)
+        self._sprite_group.add(self._player)
 
     def update(self, dt, frame_num, events):
-        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self.levels)
+        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self._player, self.levels, self._courses_taken)
+
+        courses_taken = [
+            sprite.course_id for sprite in self._sprite_group
+            if isinstance(sprite, elements.static.CourseChest)
+               and sprite.chest_state == elements.static.CourseChest.OPEN
+        ]
+
+        missing_courses = [course for course in courses_taken if course not in self._courses_taken]
+
+        if missing_courses:
+            for coor in self._grid_coordinates:
+                if self._bottom_grid[coor[0]][coor[1]] is None:
+                    try:
+                        course = missing_courses.pop(0)
+                    except IndexError:
+                        break
+                    course_tracked = elements.static.CourseTracked(course_id=course, pos=coor)
+                    self._bottom_grid[coor[0]][coor[1]] = course_tracked
+                    self._sprite_group.add(course_tracked)
+
+        self._courses_taken = courses_taken
 
     def draw(self, screen):
         sr = pygame.display.get_surface().get_rect().size

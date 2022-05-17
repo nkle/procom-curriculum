@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         self.vel = self._vec(0, 0)
         self.acc = self._vec(0, 0)
 
-    def update(self, dt, frame_num, sprites, levels):
+    def update(self, dt, frame_num, sprites, player, levels, courses_taken):
         self.acc = self._vec(0, 0)
 
         pressed_keys = pygame.key.get_pressed()
@@ -50,7 +50,9 @@ class Player(pygame.sprite.Sprite):
         on_platform = False
         for sprite in sprites:
             if isinstance(sprite, elements.static.Ladder) and pygame.sprite.collide_rect(self, sprite):
-                on_ladder = True
+                offset = self.rect.centerx - sprite.rect.centerx
+                if -10 < offset < 10:
+                    on_ladder = True
 
             elif isinstance(sprite, elements.static.PlatformTile) and pygame.sprite.collide_rect(self, sprite):
                 if self.rect.bottom > sprite.rect.top:
@@ -115,8 +117,8 @@ class Player(pygame.sprite.Sprite):
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = sr[0]
-        if self.pos.y > levels[0] + 10:
-            self.pos.y = levels[0] + 10
+        if self.pos.y > levels[0] + 5:
+            self.pos.y = levels[0] + 5
 
         self.rect.midbottom = self.pos
 
