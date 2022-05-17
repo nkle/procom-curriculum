@@ -229,11 +229,11 @@ class CourseTracked(pygame.sprite.Sprite):
         super().__init__()
         pygame.sprite.Sprite.__init__(self)
 
-        course_id = course_id or "Placeholder"
+        self._course_id = course_id or "Placeholder"
         pos = pos or (0, 0)
 
         self.font = pygame.font.Font('freesansbold.ttf', 15)
-        self.textSurf = self.font.render(course_id, True, CourseTypeTitle.WHITE)
+        self.textSurf = self.font.render(self._course_id, True, CourseTypeTitle.WHITE)
         width, height = self.textSurf.get_size()
         # self.image = pygame.Surface((width, height))
 
@@ -259,4 +259,64 @@ class CourseTracked(pygame.sprite.Sprite):
         # text_rect = text.get_rect()
         # text_rect.center = (text_pos, self._levels[i])
 
+    def update(self, dt, frame_num, sprites, player, levels, courses_taken):
+        if self._course_id not in courses_taken:
+            self.kill()
+
+
+class CourseInfoScreen(pygame.sprite.Sprite):
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 128)
+    SIDE_LEFT = "LEFT"
+    SIDE_RIGHT = "RIGHT"
+
+    def __init__(self, course_id=None, course_name=None, course_desc=None, course_link=None, side=None):
+        super().__init__()
+        pygame.sprite.Sprite.__init__(self)
+
+        self._course_id = course_id or "Placeholder"
+        course_name = course_name or "Placeholder"
+        course_desc = course_desc or "Placeholder"
+        course_link = course_link or "http://example.com"
+        side = side or CourseInfoScreen.SIDE_RIGHT
+
+        self.font = pygame.font.Font('freesansbold.ttf', 15)
+        self.textSurf = self.font.render(self._course_id, True, CourseTypeTitle.WHITE)
+        width, height = self.textSurf.get_size()
+        # self.image = pygame.Surface((width, height))
+
+        sr = pygame.display.get_surface().get_rect().size
+        # self.image = pygame.Surface(sr)
+
+        # width = 300
+        # height = 25
+        vertical_offset = 0
+        # self.image = pygame.Surface((width, height), pygame.SRCALPHA, 32)
+        self.image = pygame.Surface((sr[0] // 2, sr[1]))
+        W = self.textSurf.get_width()
+        H = self.textSurf.get_height()
+        self.image.blit(self.textSurf, (width / 2 - W / 2, height / 2 - H / 2))
+
+        # self.image.blit(self.textSurf, pos)
+
+        self.rect = self.textSurf.get_rect()
+
+        if side == CourseInfoScreen.SIDE_RIGHT:
+            pos = (sr[0] // 2, 0)
+        else:
+            pos = (0, 0)
+        self.rect.topleft = pos
+
+        # # Instruction text
+        # text = text_font.render(course_title, True, CourseTitle.WHITE)
+        # text_rect = text.get_rect()
+        # text_rect.center = (text_pos, self._levels[i])
+
+    def update(self, dt, frame_num, sprites, player, levels, courses_taken):
+        pressed_keys = pygame.key.get_pressed()
+
+        if pressed_keys[K_SPACE]:
+            self.kill()
 

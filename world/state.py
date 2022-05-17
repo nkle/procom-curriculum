@@ -84,9 +84,12 @@ class Game(WorldState):
         self._levels = dict()
 
         # Grid at the bottom w/ x, y as keys
-        self._bottom_grid = defaultdict(lambda: defaultdict(lambda: None))
+        # self._bottom_grid = defaultdict(lambda: defaultdict(lambda: None))
+        self._bottom_grid = defaultdict(lambda: None)
         self._rows = 5
         self._columns = 8
+
+        self._course_list = dict()
 
         self._build_world(kwargs["config"])
         self._courses_taken = list()
@@ -251,6 +254,7 @@ class Game(WorldState):
                             elements.static.CourseTitle(pos=(j, ((sr[1] * 5) // 8) + 10 - 105 * i),
                                                         course_id=course_info.get("id"))
                         )
+                        self._course_list[course_info["id"]] = course_info
 
                     self._platform_locations_per_year[i][course_type].append(j)
                     pt = elements.static.PlatformTile(pos=(j, ((sr[1] * 5) // 8) + 30 - 105 * i),
@@ -309,10 +313,14 @@ class Game(WorldState):
         self._sprite_group.add(self._player)
 
     def update(self, dt, frame_num, events):
-        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self._player, self.levels, self._courses_taken)
+        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self._player, self.levels,
+                                  [course.course_id for course in self._courses_taken])
 
+        sr = pygame.display.get_surface().get_rect().size
+
+        # Add tracking of courses taken
         courses_taken = [
-            sprite.course_id for sprite in self._sprite_group
+            sprite for sprite in self._sprite_group
             if isinstance(sprite, elements.static.CourseChest)
                and sprite.chest_state == elements.static.CourseChest.OPEN
         ]
@@ -321,16 +329,42 @@ class Game(WorldState):
 
         if missing_courses:
             for coor in self._grid_coordinates:
-                if self._bottom_grid[coor[0]][coor[1]] is None:
+                if self._bottom_grid[coor] is None:
                     try:
                         course = missing_courses.pop(0)
                     except IndexError:
                         break
-                    course_tracked = elements.static.CourseTracked(course_id=course, pos=coor)
-                    self._bottom_grid[coor[0]][coor[1]] = course_tracked
+                    course_tracked = elements.static.CourseTracked(course_id=course.course_id, pos=coor)
+                    self._bottom_grid[coor] = course
                     self._sprite_group.add(course_tracked)
 
+        for coor, course in self._bottom_grid.items():
+            if course not in courses_taken:
+                self._bottom_grid[coor] = None
+
         self._courses_taken = courses_taken
+
+        # Create extra info screens
+        buttons = pygame.mouse.get_pressed()
+        if buttons[0]:
+            for sprite in self._sprite_group:
+                if not isinstance(sprite, elements.static.CourseChest):
+                    continue
+
+                if sprite.rect.collidepoint(pygame.mouse.get_pos()):
+                    course_info = self._course_list[sprite.course_id]
+
+                    side = elements.static.CourseInfoScreen.SIDE_RIGHT
+                    if self._player.pos.x > sr[0] / 2:
+                        side = elements.static.CourseInfoScreen.SIDE_LEFT
+
+                    self._sprite_group.add(elements.static.CourseInfoScreen(
+                        course_id=course_info.get("id"),
+                        course_name=course_info.get("name"),
+                        course_desc=course_info.get("description"),
+                        course_link=course_info.get("link"),
+                        side=side
+                    ))
 
     def draw(self, screen):
         sr = pygame.display.get_surface().get_rect().size
