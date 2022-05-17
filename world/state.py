@@ -79,8 +79,12 @@ class StartMenu(WorldState):
 class Game(WorldState):
     def __init__(self, *args, **kwargs):
         super(Game, self).__init__(*args, **kwargs)
-
+        self._levels = dict()
         self._build_world(kwargs["config"])
+
+    @property
+    def levels(self):
+        return self._levels
 
     @staticmethod
     def _repackage_config(config):
@@ -101,14 +105,9 @@ class Game(WorldState):
 
         sr = pygame.display.get_surface().get_rect().size
 
-        # Create player
-        sam_pos = (sr[0] / 2, ((sr[1] * 5) // 8) + 30)
-        player_1 = elements.sam.Player(pos=sam_pos)
-        self._sprite_group.add(player_1)
-
         # Create platforms
         pt_size = (20, 20)
-        lad_size = (20, 100)
+        lad_size = (20, 120)
         sr = pygame.display.get_surface().get_rect().size
 
         max_years = 5
@@ -168,6 +167,7 @@ class Game(WorldState):
 
         self._platform_locations_per_year = defaultdict(lambda: defaultdict(list))
         self._connections_by_year = defaultdict(lambda: defaultdict(dict))
+        course_type_title = dict()
 
         for i in self._levels.keys():
             for course_type in all_types:
@@ -181,9 +181,19 @@ class Game(WorldState):
                     pass
 
                 cur_blocks_needed = len(courses) * course_space_multiplier
-                block_pos_needed = self._connections_by_year[i - 1].get(course_type)
 
-                cur_start = randrange(0, len(self._screen_sections_by_type[course_type]) - cur_blocks_needed)
+                for j in range(1, i + 1):
+                    block_pos_needed = self._connections_by_year[i - j].get(course_type)
+                    ladder_multiplier = j
+                    connecting_level = i - j
+
+                    if block_pos_needed is not None:
+                        break
+
+                try:
+                    cur_start = randrange(0, len(self._screen_sections_by_type[course_type]) - cur_blocks_needed)
+                except ValueError:
+                    cur_start = 0
                 cur_end = cur_start + cur_blocks_needed + 1
 
                 try:
@@ -202,8 +212,16 @@ class Game(WorldState):
                             pass
 
                 for j in self._screen_sections_by_type[course_type][cur_start: cur_end]:
+                    if j == self._screen_sections_by_type[course_type][cur_start: cur_end][0]:
+                        tile_type = "left"
+                    elif j == self._screen_sections_by_type[course_type][cur_start: cur_end][-1]:
+                        tile_type = "right"
+                    else:
+                        tile_type = "middle"
+
                     self._platform_locations_per_year[i][course_type].append(j)
-                    pt = elements.static.PlatformTile(pos=(j, ((sr[1] * 5) // 8) + 30 - 105 * i), size=pt_size)
+                    pt = elements.static.PlatformTile(pos=(j, ((sr[1] * 5) // 8) + 30 - 105 * i),
+                                                      size=pt_size, tile_type=tile_type)
                     self._sprite_group.add(pt)
 
                 self._connections_by_year[i][course_type] = self._screen_sections_by_type[course_type][randrange(cur_start, cur_end)]
@@ -213,11 +231,40 @@ class Game(WorldState):
                         0, len(self._platform_locations_per_year[i][course_type])
                     )]
 
-                lad = elements.static.Ladder(pos=(block_pos_needed, self._levels[i - 1] - lad_size[1]), size=lad_size)
-                self._sprite_group.add(lad)
+                for j in range(connecting_level, i):
+                    lad = elements.static.Ladder(pos=(block_pos_needed, self._levels[j] - lad_size[1]),
+                                                 size=(lad_size[0], lad_size[1]))
+                    self._sprite_group.add(lad)
+
+                if course_type_title.get(course_type) is None:
+                    # Add course title card
+                    text_font = pygame.font.Font('freesansbold.ttf', 20)
+                    text_pos = self._platform_locations_per_year[i][course_type][0]
+
+                    # Instruction text
+                    text = text_font.render(course_type, True, WorldState.WHITE)
+                    text_rect = text.get_rect()
+                    text_rect.center = (text_pos, self._levels[i])
+
+                    text_pos = (self._platform_locations_per_year[i][course_type][
+                        len(self._platform_locations_per_year[i][course_type]) // 2
+                                ], self._levels[i])
+
+                    course_title = elements.static.CourseTitle(course_title=course_type, pos=text_pos)
+                    # self._sprite_group.add(course_title)
+
+                    course_type_title[course_type] = course_title
 
             courses_by_types = repack_config["courses"].get(i) or {}
             prev_courses_by_types = repack_config["courses"].get(i - 1) or {}
+
+        for course_title in course_type_title.values():
+            self._sprite_group.add(course_title)
+
+        # Create player
+        sam_pos = (sr[0] / 2, ((sr[1] * 5) // 8) + 30)
+        player_1 = elements.sam.Player(pos=sam_pos)
+        self._sprite_group.add(player_1)
 
             # block_pos = list(range(30, sr[0] - 30,  pt_size[0]))
             #
@@ -237,7 +284,7 @@ class Game(WorldState):
         pass
 
     def update(self, dt, frame_num, events):
-        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites())
+        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self.levels)
 
     def draw(self, screen):
         sr = pygame.display.get_surface().get_rect().size
@@ -265,6 +312,10 @@ class StateHandler(object):
         sr = pygame.display.get_surface().get_rect()
         self.veil = pygame.Surface(sr.size)
         self.veil.fill((0, 0, 0))
+
+    @property
+    def states(self):
+        return self._states
 
     def next(self):
         if not self._fading:

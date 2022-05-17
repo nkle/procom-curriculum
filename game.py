@@ -17,7 +17,7 @@ def run_game(config):
     fps_clock = pygame.time.Clock()
 
     # Set up the window.
-    resolution = (1000, 800)
+    resolution = (1200, 800)
     screen = pygame.display.set_mode(resolution)
 
     state_handler = StateHandler(config=config)

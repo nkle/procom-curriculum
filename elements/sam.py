@@ -6,6 +6,7 @@ import os
 from pygame.locals import *
 import elements.static
 from itertools import cycle
+from math import floor
 
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -40,10 +41,29 @@ class Player(pygame.sprite.Sprite):
         self.vel = self._vec(0, 0)
         self.acc = self._vec(0, 0)
 
-    def update(self, dt, frame_num, sprites):
+    def update(self, dt, frame_num, sprites, levels):
         self.acc = self._vec(0, 0)
 
         pressed_keys = pygame.key.get_pressed()
+
+        on_ladder = False
+        on_platform = False
+        for sprite in sprites:
+            if isinstance(sprite, elements.static.Ladder) and pygame.sprite.collide_rect(self, sprite):
+                on_ladder = True
+
+            elif isinstance(sprite, elements.static.PlatformTile) and pygame.sprite.collide_rect(self, sprite):
+                if self.rect.bottom > sprite.rect.top:
+                    overlap = self.rect.bottom - sprite.rect.top
+                    if overlap < 10:
+                        self.rect.bottom -= overlap
+                        on_platform = True
+                # if self.rect.top < sprite.rect.bottom:
+                #     overlap = sprite.rect.bottom - self.rect.top
+                #     self.rect.top += overlap
+                #     on_platform = True
+
+        using_ladder = False
 
         if pressed_keys[K_LEFT]:
             self.acc.x = -Player.ACC
@@ -54,24 +74,35 @@ class Player(pygame.sprite.Sprite):
             if frame_num % 10 == 0:
                 self.image = pygame.image.load(next(self._right)).convert_alpha()
         elif pressed_keys[K_UP]:
-            if frame_num % 10 == 0:
-                self.image = pygame.image.load(next(self._back)).convert_alpha()
-            for sprite in sprites:
-                if not isinstance(sprite, elements.static.Ladder):
-                    continue
-                if pygame.sprite.collide_rect(self, sprite):
-                    self.acc.y = -Player.ACC
+            # if frame_num % 10 == 0:
+            #     self.image = pygame.image.load(next(self._back)).convert_alpha()
+
+            if on_ladder:
+                self.acc.y = -Player.ACC
+                using_ladder = True
+
         elif pressed_keys[K_DOWN]:
-            if frame_num % 10 == 0:
-                self.image = pygame.image.load(next(self._back)).convert_alpha()
-            for sprite in sprites:
-                if not isinstance(sprite, elements.static.Ladder):
-                    continue
-                if pygame.sprite.collide_rect(self, sprite):
-                    self.acc.y = Player.ACC
+            # if frame_num % 10 == 0:
+            #     self.image = pygame.image.load(next(self._back)).convert_alpha()
+
+            if on_ladder:
+                self.acc.y = Player.ACC
+                using_ladder = True
+
         else:
             if frame_num % 10 == 0:
                 self.image = pygame.image.load(next(self._front)).convert_alpha()
+
+        if not on_ladder:
+            if on_platform:
+                self.acc.y = 0
+                self.vel.y = 0
+            else:
+                self.acc.y = Player.ACC
+
+        if (on_ladder and not on_platform) or using_ladder:
+            if frame_num % 10 == 0:
+                self.image = pygame.image.load(next(self._back)).convert_alpha()
 
         self.acc.x += self.vel.x * Player.FRIC
         self.acc.y += self.vel.y * Player.FRIC
@@ -84,6 +115,8 @@ class Player(pygame.sprite.Sprite):
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = sr[0]
+        if self.pos.y > levels[0] + 10:
+            self.pos.y = levels[0] + 10
 
         self.rect.midbottom = self.pos
 

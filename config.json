@@ -60,6 +60,16 @@
         "number": 2
     },
     {
+        "class": "course",
+        "id": "FCAD Core Elective",
+        "description": "Some description",
+        "link": "https://www.ryerson.ca/procom/",
+        "year": 2,
+        "type": "FCAD Core Elective",
+        "prereq": [],
+        "number": 1
+    },
+    {
         "class": "help",
         "id": "click",
         "name": "Click on the courses to see details",

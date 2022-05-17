@@ -41,7 +41,7 @@ class PlatformTile(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, dt, frame_num, sprites):
+    def update(self, dt, frame_num, sprites, levels):
         pass
 
 
@@ -67,5 +67,49 @@ class Ladder(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1]
 
-    def update(self, dt, frame_num, sprites):
+    def update(self, dt, frame_num, sprites, levels):
         pass
+
+
+class CourseTitle(pygame.sprite.Sprite):
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 128)
+
+    def __init__(self, course_title=None, pos=None):
+        super().__init__()
+        pygame.sprite.Sprite.__init__(self)
+
+        course_title = course_title or "Placeholder"
+        pos = pos or (0, 0)
+
+        self.font = pygame.font.Font('freesansbold.ttf', 15)
+        self.textSurf = self.font.render(course_title, True, CourseTitle.WHITE)
+        width, height = self.textSurf.get_size()
+        # self.image = pygame.Surface((width, height))
+
+        # sr = pygame.display.get_surface().get_rect().size
+        # self.image = pygame.Surface(sr)
+
+        # width = 300
+        # height = 25
+        vertical_offset = 25
+        self.image = pygame.Surface((width, height), pygame.SRCALPHA, 32)
+        self.image = self.image.convert_alpha()
+        W = self.textSurf.get_width()
+        H = self.textSurf.get_height()
+        self.image.blit(self.textSurf, [width / 2 - W / 2, height / 2 - H / 2])
+
+        # self.image.blit(self.textSurf, pos)
+
+        self.rect = self.textSurf.get_rect()
+        self.rect.center = (pos[0], pos[1] + vertical_offset)
+
+        # # Instruction text
+        # text = text_font.render(course_title, True, CourseTitle.WHITE)
+        # text_rect = text.get_rect()
+        # text_rect.center = (text_pos, self._levels[i])
+
+
+
