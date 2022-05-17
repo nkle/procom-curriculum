@@ -5,9 +5,11 @@ from world.state import *
 import sys
 import json
 
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
-def run_game(config):
-    with open(config, "r") as f:
+
+def run_game():
+    with open(os.path.join(DIR_PATH, "config.json"), "r") as f:
         config = json.load(f)
 
     pygame.init()
@@ -36,5 +38,5 @@ def run_game(config):
 
 
 if __name__ == "__main__":
-    run_game(sys.argv[1])
+    run_game()
 

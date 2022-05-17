@@ -8,6 +8,8 @@ from pygame.locals import *
 from itertools import cycle
 from random import randrange
 import elements.sam
+from math import floor
+import webbrowser
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 WORLD_ASSETS_DIR = os.path.join(DIR_PATH, '..', 'assets', 'world')
@@ -282,29 +284,51 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         course_link = course_link or "http://example.com"
         side = side or CourseInfoScreen.SIDE_RIGHT
 
-        self.font = pygame.font.Font('freesansbold.ttf', 15)
-        self.textSurf = self.font.render(self._course_id, True, CourseTypeTitle.WHITE)
-        width, height = self.textSurf.get_size()
+        self.title_font = pygame.font.Font('freesansbold.ttf', 15)
+        self.title_text_surf = self.title_font.render(self._course_id, True, CourseTypeTitle.WHITE)
+        width, height = self.title_text_surf.get_size()
         # self.image = pygame.Surface((width, height))
 
-        sr = pygame.display.get_surface().get_rect().size
-        # self.image = pygame.Surface(sr)
+        width, height = pygame.display.get_surface().get_rect().size
+        width = width // 2
 
-        # width = 300
-        # height = 25
-        vertical_offset = 0
-        # self.image = pygame.Surface((width, height), pygame.SRCALPHA, 32)
-        self.image = pygame.Surface((sr[0] // 2, sr[1]))
-        W = self.textSurf.get_width()
-        H = self.textSurf.get_height()
-        self.image.blit(self.textSurf, (width / 2 - W / 2, height / 2 - H / 2))
+        self.image = pygame.Surface((width, height))
+        W = self.title_text_surf.get_width()
+        H = self.title_text_surf.get_height()
+        self.image.blit(self.title_text_surf, (width / 2 - W / 2, floor(height * 2 / 8)))
+
+        # Write description
+        lines = list()
+        first_line = floor(height * 2 / 8) + H
+        while len(lines) * H + first_line < height:
+            lines.append(len(lines) * H + first_line)
+
+        self.font = pygame.font.Font('freesansbold.ttf', 12)
+
+        start = 15
+        end = width - 15
+        cur_pos = start
+        space = 5
+        line = lines.pop(0)
+        for word in course_desc.split():
+            text_surf = self.font.render(word, True, CourseTypeTitle.WHITE)
+
+            if cur_pos + text_surf.get_width() > end:
+                cur_pos = start
+                line = lines.pop(0)
+
+            self.image.blit(text_surf, (cur_pos, line))
+
+            cur_pos += text_surf.get_width() + space
+
+        # self.text_surf = self.font.render()
 
         # self.image.blit(self.textSurf, pos)
 
-        self.rect = self.textSurf.get_rect()
+        self.rect = self.image.get_rect()
 
         if side == CourseInfoScreen.SIDE_RIGHT:
-            pos = (sr[0] // 2, 0)
+            pos = (width, 0)
         else:
             pos = (0, 0)
         self.rect.topleft = pos
