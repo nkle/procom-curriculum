@@ -313,8 +313,6 @@ class Game(WorldState):
         self._sprite_group.add(self._player)
 
     def update(self, dt, frame_num, events):
-        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self._player, self.levels,
-                                  [course.course_id for course in self._courses_taken])
 
         sr = pygame.display.get_surface().get_rect().size
 
@@ -338,9 +336,11 @@ class Game(WorldState):
                     self._bottom_grid[coor] = course
                     self._sprite_group.add(course_tracked)
 
+        removed_grid = list()
         for coor, course in self._bottom_grid.items():
             if course not in courses_taken:
                 self._bottom_grid[coor] = None
+                removed_grid.append(coor)
 
         self._courses_taken = courses_taken
 
@@ -365,6 +365,9 @@ class Game(WorldState):
                         course_link=course_info.get("link"),
                         side=side
                     ))
+
+        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self._player, self.levels,
+                                  [course.course_id for course in self._courses_taken], removed_grid)
 
     def draw(self, screen):
         sr = pygame.display.get_surface().get_rect().size

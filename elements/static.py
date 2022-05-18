@@ -152,7 +152,7 @@ class CourseChest(pygame.sprite.Sprite):
     def chest_state(self):
         return self._chest_state
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken):
+    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
         if self._chest_state == CourseChest.INACTIVE \
                 and (all(map(lambda x: x in courses_taken, self._requirements)) or not self._requirements):
             self._chest_state = CourseChest.ACTIVE
@@ -232,7 +232,7 @@ class CourseTracked(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         self._course_id = course_id or "Placeholder"
-        pos = pos or (0, 0)
+        self.pos = pos or (0, 0)
 
         self.font = pygame.font.Font('freesansbold.ttf', 15)
         self.textSurf = self.font.render(self._course_id, True, CourseTypeTitle.WHITE)
@@ -261,8 +261,8 @@ class CourseTracked(pygame.sprite.Sprite):
         # text_rect = text.get_rect()
         # text_rect.center = (text_pos, self._levels[i])
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken):
-        if self._course_id not in courses_taken:
+    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
+        if self.pos in removed_grid:
             self.kill()
 
 
@@ -299,14 +299,14 @@ class CourseInfoScreen(pygame.sprite.Sprite):
 
         # Write description
         lines = list()
-        first_line = floor(height * 2 / 8) + H
+        first_line = floor(height * 2 / 8) + H * 2
         while len(lines) * H + first_line < height:
             lines.append(len(lines) * H + first_line)
 
         self.font = pygame.font.Font('freesansbold.ttf', 12)
 
-        start = 15
-        end = width - 15
+        start = 25
+        end = width - 25
         cur_pos = start
         space = 5
         line = lines.pop(0)
@@ -338,7 +338,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         # text_rect = text.get_rect()
         # text_rect.center = (text_pos, self._levels[i])
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken):
+    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[K_SPACE]:
