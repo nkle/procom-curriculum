@@ -281,25 +281,40 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         self._course_id = course_id or "Placeholder"
         course_name = course_name or "Placeholder"
         course_desc = course_desc or "Placeholder"
-        course_link = course_link or "http://example.com"
+        self.course_link = course_link or "http://example.com"
         side = side or CourseInfoScreen.SIDE_RIGHT
-
-        self.title_font = pygame.font.Font('freesansbold.ttf', 15)
-        self.title_text_surf = self.title_font.render(self._course_id, True, CourseTypeTitle.WHITE)
-        width, height = self.title_text_surf.get_size()
-        # self.image = pygame.Surface((width, height))
 
         width, height = pygame.display.get_surface().get_rect().size
         width = width // 2
 
         self.image = pygame.Surface((width, height))
+        self.rect = self.image.get_rect()
+
+        if side == CourseInfoScreen.SIDE_RIGHT:
+            pos = (width, 0)
+        else:
+            pos = (0, 0)
+
+        self.rect.topleft = pos
+
+        # Create course ID
+        self.title_font = pygame.font.Font('freesansbold.ttf', 15)
+        self.title_text_surf = self.title_font.render(self._course_id, True, CourseTypeTitle.WHITE)
+
         W = self.title_text_surf.get_width()
         H = self.title_text_surf.get_height()
         self.image.blit(self.title_text_surf, (width / 2 - W / 2, floor(height * 2 / 8)))
 
+        # Create course name
+        self.subtitle_text_surf = self.title_font.render(course_name, True, CourseTypeTitle.WHITE)
+
+        W = self.subtitle_text_surf.get_width()
+        H = self.subtitle_text_surf.get_height()
+        self.image.blit(self.subtitle_text_surf, (width / 2 - W / 2, floor(height * 2 / 8) + H))
+
         # Write description
         lines = list()
-        first_line = floor(height * 2 / 8) + H * 2
+        first_line = floor(height * 2 / 8) + H * 3
         while len(lines) * H + first_line < height:
             lines.append(len(lines) * H + first_line)
 
@@ -310,28 +325,40 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         cur_pos = start
         space = 5
         line = lines.pop(0)
+        words = 0
         for word in course_desc.split():
             text_surf = self.font.render(word, True, CourseTypeTitle.WHITE)
 
             if cur_pos + text_surf.get_width() > end:
                 cur_pos = start
                 line = lines.pop(0)
+                words = 0
 
             self.image.blit(text_surf, (cur_pos, line))
 
             cur_pos += text_surf.get_width() + space
+            words += 1
+
+        # Write link
+        line = lines.pop(0)
+
+        # Add an extra blank line if there are words in the current line
+        if words != 0:
+            line = lines.pop(0)
+
+        self.link_font = pygame.font.Font('freesansbold.ttf', 12)
+        self.link_font.set_underline(True)
+        link_text_surf = self.font.render("Click here for more information!", True, CourseTypeTitle.WHITE)
+
+        self.image.blit(link_text_surf, (start, line))
+        self.link_rect = link_text_surf.get_rect()
+        self.link_rect.topleft = (pos[0] + start, line)
 
         # self.text_surf = self.font.render()
 
         # self.image.blit(self.textSurf, pos)
 
-        self.rect = self.image.get_rect()
 
-        if side == CourseInfoScreen.SIDE_RIGHT:
-            pos = (width, 0)
-        else:
-            pos = (0, 0)
-        self.rect.topleft = pos
 
         # # Instruction text
         # text = text_font.render(course_title, True, CourseTitle.WHITE)
