@@ -167,7 +167,7 @@ class CourseChest(pygame.sprite.Sprite):
         pos = pos or (sr[0] // 2, sr[1] // 3)
 
         self.rect.x = pos[0]
-        self.rect.y = pos[1]
+        self.rect.y = pos[1] - size[1] // 4
 
         self._requirements = requirements or list()
 
@@ -244,7 +244,7 @@ class CourseTitle(pygame.sprite.Sprite):
 
         # width = 300
         # height = 25
-        vertical_offset = - 5
+        vertical_offset = -18
         self.image = pygame.Surface((width, height), pygame.SRCALPHA, 32)
         self.image = self.image.convert_alpha()
         W = self.textSurf.get_width()

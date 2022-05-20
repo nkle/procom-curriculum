@@ -121,7 +121,7 @@ class Game(WorldState):
         # Create platforms
         pt_size = (20, 20)
         lad_size = (20, 120)
-        chest_size = (25, 25)
+        chest_size = (30, 30)
         sr = pygame.display.get_surface().get_rect().size
 
         max_years = 5
@@ -255,8 +255,9 @@ class Game(WorldState):
                                                         prereq_type=course_info.get("prereq_type"),
                                                         requirements=course_info.get("prereq"))
                         )
+                        title_center = chests[-1].rect.center
                         chests.append(
-                            elements.static.CourseTitle(pos=(j, ((sr[1] * 5) // 8) + 10 - 105 * i),
+                            elements.static.CourseTitle(pos=title_center,
                                                         course_id=course_info.get("id"),
                                                         chest_name=course_info.get("chest_name"))
                         )
@@ -290,11 +291,17 @@ class Game(WorldState):
                     text_rect = text.get_rect()
                     text_rect.center = (text_pos, self._levels[i])
 
+                    even_num_tiles = len(self._platform_locations_per_year[i][course_type]) % 2 == 0
                     text_pos = (self._platform_locations_per_year[i][course_type][
                         len(self._platform_locations_per_year[i][course_type]) // 2
                                 ], self._levels[i])
 
-                    course_title = elements.static.CourseTypeTitle(course_type=course_type, pos=text_pos)
+                    course_title = elements.static.CourseTypeTitle(course_type=course_type,
+                                                                   pos=(
+                                                                       text_pos[0] if even_num_tiles
+                                                                       else text_pos[0] + pt_size[0] // 2,
+                                                                       text_pos[1])
+                                                                   )
                     # self._sprite_group.add(course_title)
 
                     course_type_title[course_type] = course_title

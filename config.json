@@ -159,6 +159,7 @@
         {
             "class": "course",
             "id": "CMN 490",
+            "chest_name": "CMN 490",
             "name": "Applied Research Methods II",
             "description": "",
             "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/490/",
