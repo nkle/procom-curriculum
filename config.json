@@ -1,80 +1,335 @@
-[
-    {
-        "class": "course",
-        "id": "CMN 200",
-        "name": "The Craft of Professional Writing",
-        "description": "This course introduces students to genres and styles of professional writing across organizations and industries. Considering the planning, process, and production of communication texts in professional and creative settings, topics include the variety of written professional texts, audience analysis, message purpose, selection of medium and channel, the editing/revision process, and collaborative writing. This course gives students creative and conceptual tools to develop theoretical and strategic approaches to professional writing.",
-        "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/200/",
-        "year": 1,
-        "type": "Program Requirement",
-        "prereq": [] 
-    },
-    {
-        "class": "course",
-        "id": "CMN 215",
-        "name": "Messages, Modalities, and Media",
-        "description": "Some description",
-        "link": "https://www.ryerson.ca/procom/",
-        "year": 2,
-        "type": "Program Requirement",
-        "prereq": ["CMN 200"] 
-    },
-    {
-        "class": "course",
-        "id": "Open Elective",
-        "description": "Some description",
-        "link": "https://www.ryerson.ca/procom/",
-        "year": 1,
-        "type": "Electives",
-        "prereq": [],
-        "number": 3
-    },
-    {
-        "class": "course",
-        "id": "Liberal Studies - Table A",
-        "description": "Some description",
-        "link": "https://www.ryerson.ca/procom/",
-        "year": 1,
-        "type": "Liberal Studies",
-        "prereq": [],
-        "number": 3
-    },
-    {
-        "class": "course",
-        "id": "Professional Table I",
-        "description": "Some description",
-        "link": "https://www.ryerson.ca/procom/",
-        "year": 1,
-        "type": "Professional Table",
-        "prereq": [],
-        "number": 1
-    },
-    {
-        "class": "course",
-        "id": "Professional Table I",
-        "description": "Some description",
-        "link": "https://www.ryerson.ca/procom/",
-        "year": 2,
-        "type": "Professional Table",
-        "prereq": [],
-        "number": 2
-    },
-    {
-        "class": "course",
-        "id": "FCAD Core Elective",
-        "description": "Some description",
-        "link": "https://www.ryerson.ca/procom/",
-        "year": 2,
-        "type": "FCAD Core Elective",
-        "prereq": [],
-        "number": 1
-    },
-    {
-        "class": "help",
-        "id": "click",
-        "name": "Click on the courses to see details",
-        "description": "Sample description",
-        "type": "pop_up",
-        "year": 1
-    }
-]
+{
+    "type_order": ["REQUIRED", "CORE ELECTIVE", "ELECTIVE", "LIBERALS"],
+    "courses": [
+        {
+            "class": "course",
+            "id": "CMN 200",
+            "chest_name": "CMN 200",
+            "name": "The Craft of Professional Writing",
+            "description": "This course introduces students to genres and styles of professional writing across organizations and industries. Considering the planning, process, and production of communication texts in professional and creative settings, topics include the variety of written professional texts, audience analysis, message purpose, selection of medium and channel, the editing/revision process, and collaborative writing. This course gives students creative and conceptual tools to develop theoretical and strategic approaches to professional writing.",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/200/",
+            "year": 1,
+            "type": "REQUIRED",
+            "prereq": [] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 210",
+            "chest_name": "CMN 210",
+            "name": "Text, Image, and Sound",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/210/",
+            "year": 1,
+            "type": "REQUIRED",
+            "prereq": [] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 211",
+            "chest_name": "CMN 211",
+            "name": "Language and Power",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/211/",
+            "year": 1,
+            "type": "REQUIRED",
+            "prereq": [] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 216",
+            "chest_name": "CMN 216",
+            "name": "Communications Revolution",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/216/",
+            "year": 1,
+            "type": "REQUIRED",
+            "prereq": [] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 215",
+            "chest_name": "CMN 215",
+            "name": "Messages, Modalities, and Media",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/215/",
+            "year": 2,
+            "type": "REQUIRED",
+            "prereq": ["CMN 200"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 222",
+            "chest_name": "CMN 222",
+            "name": "Digital Discourse and Design",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/222/",
+            "year": 2,
+            "type": "REQUIRED",
+            "prereq": ["CMN 200"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 314",
+            "chest_name": "CMN 314",
+            "name": "Professional Presentations",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/314/",
+            "year": 2,
+            "type": "REQUIRED",
+            "prereq": ["CMN 200"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 448",
+            "chest_name": "CMN 448",
+            "name": "Introduction to Visual Communication",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/448/",
+            "year": 2,
+            "type": "REQUIRED",
+            "prereq": ["CMN 200"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 315",
+            "chest_name": "CMN 315",
+            "name": "Issues in Communication and the Workplace",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/315/",
+            "year": 3,
+            "type": "REQUIRED",
+            "prereq": ["CMN 200"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 323",
+            "chest_name": "CMN 323",
+            "name": "Introduction to Professional Practice",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/323/",
+            "year": 3,
+            "type": "REQUIRED",
+            "prereq": ["CMN 222", "CMN 314"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 324",
+            "chest_name": "CMN 324",
+            "name": "Strategic Storytelling in Industry",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/324/",
+            "year": 3,
+            "type": "REQUIRED",
+            "prereq": ["CMN 200"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 325",
+            "chest_name": "CMN 325",
+            "name": "Strategic Storytelling in Industry",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/325/",
+            "year": 3,
+            "type": "REQUIRED",
+            "prereq": ["CMN 200"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 402",
+            "chest_name": "CMN 402",
+            "name": "Theorizing Communication",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/402/",
+            "year": 4,
+            "type": "REQUIRED",
+            "prereq": ["CMN 323"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 480",
+            "chest_name": "CMN 480",
+            "name": "Applied Research Methods I",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/480/",
+            "year": 4,
+            "type": "REQUIRED",
+            "prereq_type": "EITHER",
+            "prereq": ["CMN 315", "CMN 324"] 
+        },
+        {
+            "class": "course",
+            "id": "CMN 490",
+            "name": "Applied Research Methods II",
+            "description": "",
+            "link": "https://www.ryerson.ca/calendar/2022-2023/courses/communication/CMN/490/",
+            "year": 4,
+            "type": "REQUIRED",
+            "prereq": ["CMN 480"] 
+        },
+        {
+            "class": "course",
+            "id": "Liberal Studies - Table A",
+            "chest_name": "Table A",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 1,
+            "type": "LIBERALS",
+            "prereq": [],
+            "number": 2
+        },
+        {
+            "class": "course",
+            "id": "Liberal Studies - Table A",
+            "chest_name": "Table A",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 2,
+            "type": "LIBERALS",
+            "prereq": [],
+            "number": 1
+        },
+        {
+            "class": "course",
+            "id": "Liberal Studies - Table B",
+            "chest_name": "Table B",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 3,
+            "type": "LIBERALS",
+            "prereq": [],
+            "number": 2
+        },
+        {
+            "class": "course",
+            "id": "Liberal Studies - Table B",
+            "chest_name": "Table B",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 4,
+            "type": "LIBERALS",
+            "prereq": [],
+            "number": 1
+        },
+        {
+            "class": "course",
+            "id": "Professional Table I",
+            "chest_name": "Table I",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 1,
+            "type": "CORE ELECTIVE",
+            "prereq": [],
+            "number": 1
+        },
+        {
+            "class": "course",
+            "id": "Professional Table I",
+            "chest_name": "Table I",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 2,
+            "type": "CORE ELECTIVE",
+            "prereq": [],
+            "number": 2
+        },
+        {
+            "class": "course",
+            "id": "Professional Table I",
+            "chest_name": "Table I",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 3,
+            "type": "CORE ELECTIVE",
+            "prereq": [],
+            "number": 2
+        },
+        {
+            "class": "course",
+            "id": "Professional Table I",
+            "chest_name": "Table I",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 4,
+            "type": "CORE ELECTIVE",
+            "prereq": [],
+            "number": 3
+        },
+        {
+            "class": "course",
+            "id": "Core Elective",
+            "chest_name": "Core",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 2,
+            "type": "CORE ELECTIVE",
+            "prereq": [],
+            "number": 1
+        },
+        {
+            "class": "course",
+            "id": "Core Elective",
+            "chest_name": "Core",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 3,
+            "type": "CORE ELECTIVE",
+            "prereq": [],
+            "number": 1
+        },
+        {
+            "class": "course",
+            "id": "Core Elective",
+            "chest_name": "Core",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 4,
+            "type": "CORE ELECTIVE",
+            "prereq": [],
+            "number": 1
+        },
+        {
+            "class": "course",
+            "id": "Open Elective",
+            "chest_name": "",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 1,
+            "type": "ELECTIVE",
+            "prereq": [],
+            "number": 3
+        },
+        {
+            "class": "course",
+            "id": "Open Elective",
+            "chest_name": "",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 2,
+            "type": "ELECTIVE",
+            "prereq": [],
+            "number": 2
+        },
+        {
+            "class": "course",
+            "id": "Open Elective",
+            "chest_name": "",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 3,
+            "type": "ELECTIVE",
+            "prereq": [],
+            "number": 1
+        },
+        {
+            "class": "course",
+            "id": "Open Elective",
+            "chest_name": "",
+            "description": "Some description",
+            "link": "https://www.ryerson.ca/procom/",
+            "year": 4,
+            "type": "ELECTIVE",
+            "prereq": [],
+            "number": 2
+        }
+    ]
+}

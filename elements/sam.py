@@ -106,6 +106,10 @@ class Player(pygame.sprite.Sprite):
             if frame_num % 10 == 0:
                 self.image = pygame.image.load(next(self._back)).convert_alpha()
 
+        if using_ladder:
+            self.vel.x = 0
+            self.acc.x = 0
+
         self.acc.x += self.vel.x * Player.FRIC
         self.acc.y += self.vel.y * Player.FRIC
         self.vel += self.acc

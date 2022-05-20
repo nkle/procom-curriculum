@@ -68,6 +68,29 @@ class Ladder(pygame.sprite.Sprite):
         self.rect.y = pos[1]
 
 
+class Degree(pygame.sprite.Sprite):
+    def __init__(self, pos=None, size=None):
+        super().__init__()
+        size = size or (30, 30)
+
+        tile_img_path = os.path.join(WORLD_ASSETS_DIR, "degree.png")
+
+        image = pygame.image.load(tile_img_path).convert_alpha()
+        image = pygame.transform.scale(image, size)
+        self.image = image
+        self.rect = self.image.get_rect()
+
+        sr = pygame.display.get_surface().get_rect().size
+        pos = pos or (sr[0] // 2, sr[1] // 3)
+
+        self.rect.x = pos[0]
+        self.rect.y = pos[1] - size[1]
+
+    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
+        if removed_grid:
+            self.kill()
+
+
 class CourseTypeTitle(pygame.sprite.Sprite):
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -113,11 +136,15 @@ class CourseChest(pygame.sprite.Sprite):
     ACTIVE="active"
     INACTIVE="inactive"
     OPEN="open"
+    PREREQ_ALL="ALL"
+    PREREQ_EITHER="EITHER"
 
-    def __init__(self, pos=None, size=None, course_id=None, chest_state=None, requirements=None):
+    def __init__(self, pos=None, size=None, course_id=None, chest_name=None, chest_state=None, requirements=None, prereq_type=None):
         super().__init__()
         self._course_id = course_id or "COURSE ID"
+        self._chest_name = chest_name or ""
         self._chest_state = chest_state or CourseChest.INACTIVE
+        self._prereq_type = prereq_type or CourseChest.PREREQ_ALL
         self._vec = pygame.math.Vector2
         self._size = size or (30, 30)
 
@@ -153,9 +180,22 @@ class CourseChest(pygame.sprite.Sprite):
         return self._chest_state
 
     def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
-        if self._chest_state == CourseChest.INACTIVE \
-                and (all(map(lambda x: x in courses_taken, self._requirements)) or not self._requirements):
-            self._chest_state = CourseChest.ACTIVE
+        prev_chest_state = self._chest_state
+        matching_courses_taken = map(lambda x: x in courses_taken, self._requirements)
+        if self._chest_state == CourseChest.INACTIVE:
+            if not self._requirements:
+                self._chest_state = CourseChest.ACTIVE
+            elif self._prereq_type == CourseChest.PREREQ_ALL and all(matching_courses_taken):
+                self._chest_state = CourseChest.ACTIVE
+            elif self._prereq_type == CourseChest.PREREQ_EITHER and any(matching_courses_taken):
+                self._chest_state = CourseChest.ACTIVE
+        elif (self._chest_state == CourseChest.ACTIVE or self._chest_state == CourseChest.OPEN) and self._requirements:
+            if self._prereq_type == CourseChest.PREREQ_ALL and not all(matching_courses_taken):
+                self._chest_state = CourseChest.INACTIVE
+            elif self._prereq_type == CourseChest.PREREQ_EITHER and not any(matching_courses_taken):
+                self._chest_state = CourseChest.INACTIVE
+
+        if prev_chest_state != self._chest_state:
             image = pygame.image.load(self._chest_states[self._chest_state]).convert_alpha()
             image = pygame.transform.scale(image, self._size)
             self.image = image
@@ -186,15 +226,16 @@ class CourseTitle(pygame.sprite.Sprite):
     GREEN = (0, 255, 0)
     BLUE = (0, 0, 128)
 
-    def __init__(self, course_id=None, pos=None):
+    def __init__(self, course_id=None, chest_name=None, pos=None):
         super().__init__()
         pygame.sprite.Sprite.__init__(self)
 
         course_id = course_id or "Placeholder"
+        chest_name = chest_name or ""
         pos = pos or (0, 0)
 
         self.font = pygame.font.Font('freesansbold.ttf', 10)
-        self.textSurf = self.font.render(course_id, True, CourseTypeTitle.WHITE)
+        self.textSurf = self.font.render(chest_name, True, CourseTypeTitle.WHITE)
         width, height = self.textSurf.get_size()
         # self.image = pygame.Surface((width, height))
 
@@ -298,7 +339,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         self.rect.topleft = pos
 
         # Create course ID
-        self.title_font = pygame.font.Font('freesansbold.ttf', 15)
+        self.title_font = pygame.font.Font('freesansbold.ttf', 16)
         self.title_text_surf = self.title_font.render(self._course_id, True, CourseTypeTitle.WHITE)
 
         W = self.title_text_surf.get_width()
@@ -318,10 +359,10 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         while len(lines) * H + first_line < height:
             lines.append(len(lines) * H + first_line)
 
-        self.font = pygame.font.Font('freesansbold.ttf', 12)
+        self.font = pygame.font.Font('freesansbold.ttf', 14)
 
-        start = 25
-        end = width - 25
+        start = 35
+        end = width - 35
         cur_pos = start
         space = 5
         line = lines.pop(0)
@@ -346,7 +387,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         if words != 0:
             line = lines.pop(0)
 
-        self.link_font = pygame.font.Font('freesansbold.ttf', 12)
+        self.link_font = pygame.font.Font('freesansbold.ttf', 14)
         self.link_font.set_underline(True)
         link_text_surf = self.font.render("Click here for more information!", True, CourseTypeTitle.WHITE)
 

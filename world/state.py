@@ -114,7 +114,7 @@ class Game(WorldState):
         self._levels = {i: level_zero - 105 * i for i in range(1, 5)}
         self._levels[0] = level_zero
 
-        repack_config = self._repackage_config(config)
+        repack_config = self._repackage_config(config["courses"])
 
         sr = pygame.display.get_surface().get_rect().size
 
@@ -145,9 +145,10 @@ class Game(WorldState):
             pt = elements.static.PlatformTile(pos=(j, self._levels[0]), size=pt_size, tile_type=tile_type)
             self._sprite_group.add(pt)
 
-        all_types = list(set(
-            course_type for course_types in repack_config["course"].values() for course_type in course_types
-        ))
+        # all_types = list(set(
+        #     course_type for course_types in repack_config["course"].values() for course_type in course_types
+        # ))
+        all_types = config["type_order"]
 
         sizes_by_type = {
             element_type: max(
@@ -168,6 +169,7 @@ class Game(WorldState):
 
         self._screen_sections_by_type = dict()
         cur_start = 0
+
         for course_type in all_types:
             num_blocks = sizes_by_type[course_type]
 
@@ -249,12 +251,16 @@ class Game(WorldState):
                         chests.append(
                             elements.static.CourseChest(pos=(j, ((sr[1] * 5) // 8) + 10 - 105 * i), size=chest_size,
                                                         course_id=course_info.get("id"),
+                                                        chest_name=course_info.get("chest_name"),
+                                                        prereq_type=course_info.get("prereq_type"),
                                                         requirements=course_info.get("prereq"))
                         )
                         chests.append(
                             elements.static.CourseTitle(pos=(j, ((sr[1] * 5) // 8) + 10 - 105 * i),
-                                                        course_id=course_info.get("id"))
+                                                        course_id=course_info.get("id"),
+                                                        chest_name=course_info.get("chest_name"))
                         )
+
                         self._course_list[course_info["id"]] = course_info
 
                     self._platform_locations_per_year[i][course_type].append(j)
@@ -299,6 +305,8 @@ class Game(WorldState):
         for course_title in course_type_title.values():
             self._sprite_group.add(course_title)
 
+        self._total_courses = len(chests) // 2
+
         for chest in chests:
             self._sprite_group.add(chest)
 
@@ -338,10 +346,15 @@ class Game(WorldState):
                     self._sprite_group.add(course_tracked)
 
         removed_grid = list()
+        completed_requirements = 0
+
         for coor, course in self._bottom_grid.items():
-            if course not in courses_taken:
+            if course is not None and course not in courses_taken:
                 self._bottom_grid[coor] = None
                 removed_grid.append(coor)
+
+            if self._bottom_grid[coor] is not None:
+                completed_requirements += 1
 
         self._courses_taken = courses_taken
 
@@ -365,6 +378,13 @@ class Game(WorldState):
                     ))
                 elif isinstance(sprite, elements.static.CourseInfoScreen) and sprite.link_rect.collidepoint(pygame.mouse.get_pos()):
                     webbrowser.open_new(sprite.course_link)
+
+        # Add degree
+        degree_size = (30, 30)
+        degree_present = any([isinstance(sprite, elements.static.Degree) for sprite in self._sprite_group])
+        if completed_requirements >= self._total_courses and not any(
+                [isinstance(sprite, elements.static.Degree) for sprite in self._sprite_group]):
+            self._sprite_group.add(elements.static.Degree(pos=(sr[0] // 2, self._levels[0]), size=degree_size))
 
         self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self._player, self.levels,
                                   [course.course_id for course in self._courses_taken], removed_grid)
