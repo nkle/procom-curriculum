@@ -1,5 +1,22 @@
 {
-    "type_order": ["REQUIRED", "CORE ELECTIVE", "ELECTIVE", "LIBERALS"],
+    "types": [
+        {
+            "type": "REQUIRED",
+            "color": "BLUE"
+        },
+        {
+            "type": "CORE ELECTIVE",
+            "color": "GREEN"
+        },
+        {
+            "type": "ELECTIVE",
+            "color": "RED"
+        },
+        {
+            "type": "LIBERALS",
+            "color": "PURPLE"
+        }
+    ],
     "courses": [
         {
             "class": "course",

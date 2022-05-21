@@ -10,6 +10,7 @@ from random import randrange
 import elements.sam
 from math import floor
 import webbrowser
+from collections import defaultdict
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 WORLD_ASSETS_DIR = os.path.join(DIR_PATH, '..', 'assets', 'world')
@@ -138,11 +139,23 @@ class CourseChest(pygame.sprite.Sprite):
     OPEN="open"
     PREREQ_ALL="ALL"
     PREREQ_EITHER="EITHER"
+    COLOR_BLUE="BLUE"
+    COLOR_GREEN="GREEN"
+    COLOR_RED="RED"
+    COLOR_PURPLE="PURPLE"
 
-    def __init__(self, pos=None, size=None, course_id=None, chest_name=None, chest_state=None, requirements=None, prereq_type=None):
+    COLORS = {
+        COLOR_BLUE: (72, 168, 233),
+        COLOR_GREEN: (80, 176, 164),
+        COLOR_RED: (224, 107, 97),
+        COLOR_PURPLE: (184, 148, 225)
+    }
+
+    def __init__(self, pos=None, size=None, course_id=None, chest_name=None, course_color=None, chest_state=None, requirements=None, prereq_type=None):
         super().__init__()
         self._course_id = course_id or "COURSE ID"
         self._chest_name = chest_name or ""
+        self._course_color = CourseChest.COLORS[course_color or CourseChest.COLOR_BLUE]
         self._chest_state = chest_state or CourseChest.INACTIVE
         self._prereq_type = prereq_type or CourseChest.PREREQ_ALL
         self._vec = pygame.math.Vector2
@@ -170,6 +183,10 @@ class CourseChest(pygame.sprite.Sprite):
         self.rect.y = pos[1] - size[1] // 4
 
         self._requirements = requirements or list()
+
+    @property
+    def course_color(self):
+        return self._course_color
 
     @property
     def course_id(self):
@@ -268,14 +285,17 @@ class CourseTracked(pygame.sprite.Sprite):
     GREEN = (0, 255, 0)
     BLUE = (0, 0, 128)
 
-    def __init__(self, course_id=None, pos=None):
+    def __init__(self, course_id=None, course_color=None, size=None, pos=None):
         super().__init__()
         pygame.sprite.Sprite.__init__(self)
 
+        size = size or (100, 30)
+
         self._course_id = course_id or "Placeholder"
         self.pos = pos or (0, 0)
+        self._course_color = course_color or CourseChest.COLORS[CourseChest.COLOR_BLUE]
 
-        self.font = pygame.font.Font('freesansbold.ttf', 15)
+        self.font = pygame.font.Font('freesansbold.ttf', 9)
         self.textSurf = self.font.render(self._course_id, True, CourseTypeTitle.WHITE)
         width, height = self.textSurf.get_size()
         # self.image = pygame.Surface((width, height))
@@ -286,16 +306,18 @@ class CourseTracked(pygame.sprite.Sprite):
         # width = 300
         # height = 25
         vertical_offset = 0
-        self.image = pygame.Surface((width, height), pygame.SRCALPHA, 32)
-        self.image = self.image.convert_alpha()
+        # self.image = pygame.Surface((width, height), pygame.SRCALPHA, 32)
+        self.image = pygame.Surface(size)
+        self.image.fill(self._course_color)
+        width, height = self.image.get_size()
         W = self.textSurf.get_width()
         H = self.textSurf.get_height()
         self.image.blit(self.textSurf, (width / 2 - W / 2, height / 2 - H / 2))
 
         # self.image.blit(self.textSurf, pos)
 
-        self.rect = self.textSurf.get_rect()
-        self.rect.center = (pos[0], pos[1] + vertical_offset)
+        self.rect = self.image.get_rect()
+        self.rect.center = (pos[0], pos[1])
 
         # # Instruction text
         # text = text_font.render(course_title, True, CourseTitle.WHITE)
@@ -315,10 +337,11 @@ class CourseInfoScreen(pygame.sprite.Sprite):
     SIDE_LEFT = "LEFT"
     SIDE_RIGHT = "RIGHT"
 
-    def __init__(self, course_id=None, course_name=None, course_desc=None, course_link=None, side=None):
+    def __init__(self, course_id=None, course_name=None, course_desc=None, course_link=None, course_info=None, side=None):
         super().__init__()
         pygame.sprite.Sprite.__init__(self)
 
+        self._course_info = course_info or defaultdict(str)
         self._course_id = course_id or "Placeholder"
         course_name = course_name or "Placeholder"
         course_desc = course_desc or "Placeholder"

@@ -148,7 +148,10 @@ class Game(WorldState):
         # all_types = list(set(
         #     course_type for course_types in repack_config["course"].values() for course_type in course_types
         # ))
-        all_types = config["type_order"]
+        all_types = [type_info["type"] for type_info in config["types"]]
+        self._colors_by_type = {
+            type_info["type"]: type_info["color"] for type_info in config["types"]
+        }
 
         sizes_by_type = {
             element_type: max(
@@ -176,7 +179,10 @@ class Game(WorldState):
             if course_type == all_types[-1]:
                 used_extra_blocks = extra_blocks
             else:
-                used_extra_blocks = randrange(0, extra_blocks)
+                try:
+                    used_extra_blocks = randrange(0, extra_blocks)
+                except ValueError:
+                    used_extra_blocks = 0
 
             extra_blocks -= used_extra_blocks
 
@@ -251,6 +257,7 @@ class Game(WorldState):
                         chests.append(
                             elements.static.CourseChest(pos=(j, ((sr[1] * 5) // 8) + 10 - 105 * i), size=chest_size,
                                                         course_id=course_info.get("id"),
+                                                        course_color=self._colors_by_type[course_info.get("type")],
                                                         chest_name=course_info.get("chest_name"),
                                                         prereq_type=course_info.get("prereq_type"),
                                                         requirements=course_info.get("prereq"))
@@ -319,7 +326,7 @@ class Game(WorldState):
 
         # Create bottom grid coordinates
         self._grid_coordinates = [(floor(sr[0] * x / (self._columns + 2)),
-                                   floor((sr[1] * 5 / 8) + (sr[1] * 4 / 8) * y / (self._rows + 2)))
+                                   floor((sr[1] * 5 / 8 + 30) + (sr[1] * 3 / 8 + 30) * y / (self._rows + 2)))
                                   for x in range(1, self._columns + 1)
                                   for y in range(1, self._rows + 1)]
 
@@ -348,7 +355,10 @@ class Game(WorldState):
                         course = missing_courses.pop(0)
                     except IndexError:
                         break
-                    course_tracked = elements.static.CourseTracked(course_id=course.course_id, pos=coor)
+                    course_tracked = elements.static.CourseTracked(course_id=course.course_id,
+                                                                   course_color=course.course_color,
+                                                                   size=(120, 50),
+                                                                   pos=coor)
                     self._bottom_grid[coor] = course
                     self._sprite_group.add(course_tracked)
 
