@@ -403,31 +403,46 @@ class CourseInfoScreen(pygame.sprite.Sprite):
             cur_pos += text_surf.get_width() + space
             words += 1
 
-        # Write link
+        # Write requirements
         line = lines.pop(0)
 
         # Add an extra blank line if there are words in the current line
         if words != 0:
             line = lines.pop(0)
 
+        self.requirements_font = pygame.font.Font('freesansbold.ttf', 14)
+        requirements_text_surf = self.requirements_font.render(
+            "Requirements: " + (
+                " and " if course_info.get("prereq_type", "ALL") == "ALL"
+                else " or "
+            ).join(course_info.get("prereq", list())), True, CourseTypeTitle.WHITE
+        )
+        self.image.blit(requirements_text_surf, (start, line))
+
+        # Leave an empty line
+        _ = lines.pop(0)
+        line = lines.pop(0)
+
         self.link_font = pygame.font.Font('freesansbold.ttf', 14)
         self.link_font.set_underline(True)
-        link_text_surf = self.font.render("Click here for more information!", True, CourseTypeTitle.WHITE)
+        link_text_surf = self.link_font.render("Click here for more information!", True, CourseTypeTitle.WHITE)
 
         self.image.blit(link_text_surf, (start, line))
+
+        # Define link rectangle for clicking and opening browser
         self.link_rect = link_text_surf.get_rect()
         self.link_rect.topleft = (pos[0] + start, line)
 
-        # self.text_surf = self.font.render()
+        # Write exit instructions
+        _ = lines.pop(0)
+        _ = lines.pop(0)
+        line = lines.pop(0)
 
-        # self.image.blit(self.textSurf, pos)
+        self.exit_instructions_font = pygame.font.Font('freesansbold.ttf', 14)
+        exit_instructions_surf = self.exit_instructions_font.render("PRESS SPACEBAR TO CONTINUE.", True, CourseTypeTitle.WHITE)
 
-
-
-        # # Instruction text
-        # text = text_font.render(course_title, True, CourseTitle.WHITE)
-        # text_rect = text.get_rect()
-        # text_rect.center = (text_pos, self._levels[i])
+        W = exit_instructions_surf.get_width()
+        self.image.blit(exit_instructions_surf, (width / 2 - W / 2, line))
 
     def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
         pressed_keys = pygame.key.get_pressed()

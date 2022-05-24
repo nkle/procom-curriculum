@@ -45,16 +45,20 @@ class WorldState(object):
 
 
 class StartMenu(WorldState):
+    """WorldState that has the start menu information."""
     def __init__(self, *args, **kwargs):
         super(StartMenu, self).__init__(*args, **kwargs)
         self._build_assets()
 
     def _build_assets(self):
+        # Get screen size
         sr = pygame.display.get_surface().get_rect().size
+
+        # Create large font for main title and subtitle
         large_text_font = pygame.font.Font('freesansbold.ttf', 40)
         text_font = pygame.font.Font('freesansbold.ttf', 20)
 
-        # Title text
+        # Title text render and add
         text = large_text_font.render('ProCom Curriculum 2022', True, WorldState.BLUE, WorldState.BLACK)
         text_rect = text.get_rect()
         text_rect.center = (sr[0] // 2, sr[1] // 3)
@@ -69,12 +73,14 @@ class StartMenu(WorldState):
     def draw(self, screen):
         screen.fill(WorldState.BLACK)
 
+        # Iterate over dict items and draw them on screen
         for asset_name, asset in self._assets.items():
             screen.blit(asset[0], asset[1])
 
     def update(self, dt, frame_num, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
+                # When spacebar is pressed, send request to change states
                 if event.key == pygame.K_SPACE:
                     return StateHandler.GAME
 
@@ -84,8 +90,6 @@ class Game(WorldState):
         super(Game, self).__init__(*args, **kwargs)
         self._levels = dict()
 
-        # Grid at the bottom w/ x, y as keys
-        # self._bottom_grid = defaultdict(lambda: defaultdict(lambda: None))
         self._bottom_grid = defaultdict(lambda: None)
         self._rows = 5
         self._columns = 8
@@ -391,6 +395,7 @@ class Game(WorldState):
                         course_name=course_info.get("name"),
                         course_desc=course_info.get("description"),
                         course_link=course_info.get("link"),
+                        course_info=course_info,
                         side=side
                     ))
                 elif isinstance(sprite, elements.static.CourseInfoScreen) and sprite.link_rect.collidepoint(pygame.mouse.get_pos()):
@@ -430,6 +435,8 @@ class StateHandler(object):
         self._fading = None
         self._alpha = 0
         sr = pygame.display.get_surface().get_rect()
+
+        # Black veil for fade in and fade out
         self.veil = pygame.Surface(sr.size)
         self.veil.fill((0, 0, 0))
 
