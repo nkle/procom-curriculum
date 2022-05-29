@@ -15,6 +15,7 @@ from math import floor
 from itertools import cycle
 from random import randrange
 import webbrowser
+import datetime
 
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -379,27 +380,31 @@ class Game(WorldState):
 
         self._courses_taken = courses_taken
 
-        # Create extra info screens
-        buttons = pygame.mouse.get_pressed()
-        if buttons[0]:
-            for sprite in self._sprite_group:
-                if isinstance(sprite, elements.static.CourseChest) and sprite.rect.collidepoint(pygame.mouse.get_pos()):
-                    course_info = self._course_list[sprite.course_id]
+        # # Create extra info screens
+        # buttons = pygame.mouse.get_pressed()
+        # if buttons[0]:
 
-                    side = elements.static.CourseInfoScreen.SIDE_RIGHT
-                    if self._player.pos.x > sr[0] / 2:
-                        side = elements.static.CourseInfoScreen.SIDE_LEFT
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for sprite in self._sprite_group:
+                    if isinstance(sprite, elements.static.CourseChest) and sprite.rect.collidepoint(pygame.mouse.get_pos()):
+                        course_info = self._course_list[sprite.course_id]
 
-                    self._sprite_group.add(elements.static.CourseInfoScreen(
-                        course_id=course_info.get("id"),
-                        course_name=course_info.get("name"),
-                        course_desc=course_info.get("description"),
-                        course_link=course_info.get("link"),
-                        course_info=course_info,
-                        side=side
-                    ))
-                elif isinstance(sprite, elements.static.CourseInfoScreen) and sprite.link_rect.collidepoint(pygame.mouse.get_pos()):
-                    webbrowser.open_new(sprite.course_link)
+                        side = elements.static.CourseInfoScreen.SIDE_RIGHT
+                        if self._player.pos.x > sr[0] / 2:
+                            side = elements.static.CourseInfoScreen.SIDE_LEFT
+
+                        self._sprite_group.add(elements.static.CourseInfoScreen(
+                            course_id=course_info.get("id"),
+                            course_name=course_info.get("name"),
+                            course_desc=course_info.get("description"),
+                            course_link=course_info.get("link"),
+                            course_info=course_info,
+                            side=side
+                        ))
+                    elif isinstance(sprite, elements.static.CourseInfoScreen) and sprite.link_rect.collidepoint(pygame.mouse.get_pos()):
+                        print(frame_num)
+                        webbrowser.open_new(sprite.course_link)
 
         # Add degree
         degree_size = (30, 30)
