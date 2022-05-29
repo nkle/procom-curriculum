@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         self.vel = self._vec(0, 0)
         self.acc = self._vec(0, 0)
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
+    def update(self, dt, frame_num, events, sprites, player, levels, courses_taken, removed_grid):
         self.acc = self._vec(0, 0)
 
         pressed_keys = pygame.key.get_pressed()

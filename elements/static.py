@@ -87,7 +87,7 @@ class Degree(pygame.sprite.Sprite):
         self.rect.x = pos[0]
         self.rect.y = pos[1] - size[1]
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
+    def update(self, dt, frame_num, events, sprites, player, levels, courses_taken, removed_grid):
         if removed_grid:
             self.kill()
 
@@ -196,7 +196,7 @@ class CourseChest(pygame.sprite.Sprite):
     def chest_state(self):
         return self._chest_state
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
+    def update(self, dt, frame_num, events, sprites, player, levels, courses_taken, removed_grid):
         prev_chest_state = self._chest_state
         matching_courses_taken = map(lambda x: x in courses_taken, self._requirements)
         if self._chest_state == CourseChest.INACTIVE:
@@ -224,17 +224,19 @@ class CourseChest(pygame.sprite.Sprite):
         if pygame.sprite.collide_rect(self, player):
             touched = True
 
-        if touched and pressed_keys[K_SPACE] and frame_num % 5 == 0:
-            if self._chest_state == CourseChest.ACTIVE:
-                self._chest_state = CourseChest.OPEN
-                image = pygame.image.load(self._chest_states[self._chest_state]).convert_alpha()
-                image = pygame.transform.scale(image, self._size)
-                self.image = image
-            elif self._chest_state == CourseChest.OPEN:
-                self._chest_state = CourseChest.ACTIVE
-                image = pygame.image.load(self._chest_states[self._chest_state]).convert_alpha()
-                image = pygame.transform.scale(image, self._size)
-                self.image = image
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if touched and event.key == pygame.K_SPACE:
+                    if self._chest_state == CourseChest.ACTIVE:
+                        self._chest_state = CourseChest.OPEN
+                        image = pygame.image.load(self._chest_states[self._chest_state]).convert_alpha()
+                        image = pygame.transform.scale(image, self._size)
+                        self.image = image
+                    elif self._chest_state == CourseChest.OPEN:
+                        self._chest_state = CourseChest.ACTIVE
+                        image = pygame.image.load(self._chest_states[self._chest_state]).convert_alpha()
+                        image = pygame.transform.scale(image, self._size)
+                        self.image = image
 
 
 class CourseTitle(pygame.sprite.Sprite):
@@ -324,7 +326,7 @@ class CourseTracked(pygame.sprite.Sprite):
         # text_rect = text.get_rect()
         # text_rect.center = (text_pos, self._levels[i])
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
+    def update(self, dt, frame_num, events, sprites, player, levels, courses_taken, removed_grid):
         if self.pos in removed_grid:
             self.kill()
 
@@ -444,7 +446,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         W = exit_instructions_surf.get_width()
         self.image.blit(exit_instructions_surf, (width / 2 - W / 2, line))
 
-    def update(self, dt, frame_num, sprites, player, levels, courses_taken, removed_grid):
+    def update(self, dt, frame_num, events, sprites, player, levels, courses_taken, removed_grid):
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[K_SPACE]:

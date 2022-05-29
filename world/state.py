@@ -413,7 +413,7 @@ class Game(WorldState):
                 [isinstance(sprite, elements.static.Degree) for sprite in self._sprite_group]):
             self._sprite_group.add(elements.static.Degree(pos=(sr[0] // 2, self._levels[0]), size=degree_size))
 
-        self._sprite_group.update(dt, frame_num, self._sprite_group.sprites(), self._player, self.levels,
+        self._sprite_group.update(dt, frame_num, events, self._sprite_group.sprites(), self._player, self.levels,
                                   [course.course_id for course in self._courses_taken], removed_grid)
 
     def draw(self, screen):
