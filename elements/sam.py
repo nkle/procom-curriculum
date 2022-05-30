@@ -1,15 +1,15 @@
-import pygame.sprite
+from itertools import cycle
+
+import pygame.display
 import pygame.image
 import pygame.math
-import pygame.display
-import os
+import pygame.sprite
 from pygame.locals import *
+
 import elements.static
-from itertools import cycle
-from math import floor
+from utils.common import *
 
-
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+SAM_ASSETS_PATH = get_path(os.path.join('assets', 'sam'))
 
 
 class Player(pygame.sprite.Sprite):
@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         # self.surf = pygame.Surface((30, 30))
         # self.surf.fill((128,255,40))
         # self.rect = self.surf.get_rect(center = (10, 420))
-        sam_dir = os.path.join(DIR_PATH, '..', 'assets', 'sam')
+        sam_dir = SAM_ASSETS_PATH
 
         self._right = cycle([os.path.join(sam_dir, "Right{}.png".format(i)) for i in range(1,5)])
         self._left = cycle([os.path.join(sam_dir, "Left{}.png".format(i)) for i in range(1,5)])

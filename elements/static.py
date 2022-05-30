@@ -1,19 +1,16 @@
-import pygame.sprite
-import pygame.transform
+from collections import defaultdict
+from math import floor
+
+import pygame.display
 import pygame.image
 import pygame.math
-import pygame.display
-import os
+import pygame.sprite
+import pygame.transform
 from pygame.locals import *
-from itertools import cycle
-from random import randrange
-import elements.sam
-from math import floor
-import webbrowser
-from collections import defaultdict
 
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-WORLD_ASSETS_DIR = os.path.join(DIR_PATH, '..', 'assets', 'world')
+from utils.common import *
+
+WORLD_ASSETS_DIR = get_path(os.path.join('assets', 'world'))
 
 
 class PlatformTile(pygame.sprite.Sprite):

@@ -2,14 +2,14 @@ import json
 
 import pygame
 
+from utils.common import *
 from world.state import *
-
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
 def run_game():
     # Load the configuration file
-    with open(os.path.join(DIR_PATH, "config.json"), "r") as f:
+    config_path = get_path("config.json")
+    with open(config_path, "r") as f:
         config = json.load(f)
 
     # Start PyGame and set name of app

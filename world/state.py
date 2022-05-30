@@ -1,25 +1,21 @@
 from __future__ import division
+
+import webbrowser
+from collections import defaultdict
+from functools import reduce
+from math import floor
+from random import randrange
+
+import pygame.display
 import pygame.font
 import pygame.sprite
-import pygame.display
 from pygame.locals import *
-import sys
+
 import elements.sam
 import elements.static
-import random
-from collections import defaultdict
-import colour
-from functools import reduce
-import os
-from math import floor
-from itertools import cycle
-from random import randrange
-import webbrowser
-import datetime
+from utils.common import *
 
-
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-WORLD_ASSETS_DIR = os.path.join(DIR_PATH, '..', 'assets', 'world')
+WORLD_ASSETS_DIR = get_path(os.path.join('assets', 'world'))
 
 
 class WorldState(object):
