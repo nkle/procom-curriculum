@@ -102,7 +102,7 @@ class CourseTypeTitle(pygame.sprite.Sprite):
         course_type = course_type or "Placeholder"
         pos = pos or (0, 0)
 
-        self.font = pygame.font.Font('freesansbold.ttf', 15)
+        self.font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 15)
         self.textSurf = self.font.render(course_type, True, CourseTypeTitle.WHITE)
         width, height = self.textSurf.get_size()
         # self.image = pygame.Surface((width, height))
@@ -250,7 +250,7 @@ class CourseTitle(pygame.sprite.Sprite):
         chest_name = chest_name or ""
         pos = pos or (0, 0)
 
-        self.font = pygame.font.Font('freesansbold.ttf', 10)
+        self.font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 10)
         self.textSurf = self.font.render(chest_name, True, CourseTypeTitle.WHITE)
         width, height = self.textSurf.get_size()
         # self.image = pygame.Surface((width, height))
@@ -294,7 +294,7 @@ class CourseTracked(pygame.sprite.Sprite):
         self.pos = pos or (0, 0)
         self._course_color = course_color or CourseChest.COLORS[CourseChest.COLOR_BLUE]
 
-        self.font = pygame.font.Font('freesansbold.ttf', 9)
+        self.font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 9)
         self.textSurf = self.font.render(self._course_id, True, CourseTypeTitle.WHITE)
         width, height = self.textSurf.get_size()
         # self.image = pygame.Surface((width, height))
@@ -361,7 +361,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         self.rect.topleft = pos
 
         # Create course ID
-        self.title_font = pygame.font.Font('freesansbold.ttf', 16)
+        self.title_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 16)
         self.title_text_surf = self.title_font.render(self._course_id, True, CourseTypeTitle.WHITE)
 
         W = self.title_text_surf.get_width()
@@ -381,7 +381,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         while len(lines) * H + first_line < height:
             lines.append(len(lines) * H + first_line)
 
-        self.font = pygame.font.Font('freesansbold.ttf', 14)
+        self.font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 14)
 
         start = 35
         end = width - 35
@@ -409,7 +409,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         if words != 0:
             line = lines.pop(0)
 
-        self.requirements_font = pygame.font.Font('freesansbold.ttf', 14)
+        self.requirements_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 14)
         requirements_text_surf = self.requirements_font.render(
             "Requirements: " + (
                 " and " if course_info.get("prereq_type", "ALL") == "ALL"
@@ -422,7 +422,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         _ = lines.pop(0)
         line = lines.pop(0)
 
-        self.link_font = pygame.font.Font('freesansbold.ttf', 14)
+        self.link_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 14)
         self.link_font.set_underline(True)
         link_text_surf = self.link_font.render("Click here for more information!", True, CourseTypeTitle.WHITE)
 
@@ -437,7 +437,7 @@ class CourseInfoScreen(pygame.sprite.Sprite):
         _ = lines.pop(0)
         line = lines.pop(0)
 
-        self.exit_instructions_font = pygame.font.Font('freesansbold.ttf', 14)
+        self.exit_instructions_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 14)
         exit_instructions_surf = self.exit_instructions_font.render("PRESS SPACEBAR TO CONTINUE.", True, CourseTypeTitle.WHITE)
 
         W = exit_instructions_surf.get_width()

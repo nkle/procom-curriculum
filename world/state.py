@@ -52,8 +52,8 @@ class StartMenu(WorldState):
         sr = pygame.display.get_surface().get_rect().size
 
         # Create large font for main title and subtitle
-        large_text_font = pygame.font.Font('freesansbold.ttf', 40)
-        text_font = pygame.font.Font('freesansbold.ttf', 20)
+        large_text_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 40)
+        text_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 20)
 
         # Title text render and add
         text = large_text_font.render('ProCom Curriculum 2022', True, WorldState.BLUE, WorldState.BLACK)
@@ -291,7 +291,7 @@ class Game(WorldState):
 
                 if course_type_title.get(course_type) is None:
                     # Add course title card
-                    text_font = pygame.font.Font('freesansbold.ttf', 20)
+                    text_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 20)
                     text_pos = self._platform_locations_per_year[i][course_type][0]
 
                     # Instruction text
