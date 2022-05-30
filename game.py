@@ -24,6 +24,10 @@ def run_game():
     resolution = (1200, 800)
     screen = pygame.display.set_mode(resolution)
 
+    # Set icon
+    icon = pygame.image.load(get_path(os.path.join('assets', 'procom22.icns')))
+    pygame.display.set_icon(icon)
+
     # Initialize state handler that manages the fade in between menu and game screen
     state_handler = StateHandler(config=config)
     state_handler.fade_in()

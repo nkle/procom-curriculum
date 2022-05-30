@@ -96,6 +96,8 @@ class Game(WorldState):
         self._build_world(kwargs["config"])
         self._courses_taken = list()
 
+        self._active_course_info = None
+
     @property
     def levels(self):
         return self._levels
@@ -390,17 +392,28 @@ class Game(WorldState):
                         if self._player.pos.x > sr[0] / 2:
                             side = elements.static.CourseInfoScreen.SIDE_LEFT
 
-                        self._sprite_group.add(elements.static.CourseInfoScreen(
+                        course_info_scr = elements.static.CourseInfoScreen(
                             course_id=course_info.get("id"),
                             course_name=course_info.get("name"),
                             course_desc=course_info.get("description"),
                             course_link=course_info.get("link"),
                             course_info=course_info,
                             side=side
-                        ))
+                        )
+
+                        if self._active_course_info is not None:
+                            self._active_course_info.kill()
+
+                        self._active_course_info = course_info_scr
+
+                        self._sprite_group.add(course_info_scr)
                     elif isinstance(sprite, elements.static.CourseInfoScreen) and sprite.link_rect.collidepoint(pygame.mouse.get_pos()):
                         print(frame_num)
                         webbrowser.open_new(sprite.course_link)
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self._active_course_info = None
 
         # Add degree
         degree_size = (30, 30)
