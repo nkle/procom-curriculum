@@ -27,7 +27,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='ProCom22',
+    name='ProCom23',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

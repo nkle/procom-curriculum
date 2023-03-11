@@ -14,7 +14,7 @@ def run_game():
 
     # Start PyGame and set name of app
     pygame.init()
-    pygame.display.set_caption("ProCom Curriculum 2021")
+    pygame.display.set_caption("ProCom Curriculum 2023")
 
     # Set FPS and game clock
     fps = 60.0
