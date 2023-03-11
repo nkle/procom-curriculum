@@ -1,8 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 block_cipher = None
-
 
 a = Analysis(
     ['game.py'],
@@ -19,6 +17,7 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
+
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
@@ -41,8 +40,9 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/procom22.icns',
+    icon='./assets/procom22.icns',
 )
+
 app = BUNDLE(
     exe,
     name='ProCom22.app',
