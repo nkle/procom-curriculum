@@ -45,7 +45,7 @@ exe = EXE(
 
 app = BUNDLE(
     exe,
-    name='ProCom22.app',
+    name='ProCom23.app',
     icon='./assets/procom22.icns',
     bundle_identifier=None,
 )
