@@ -56,7 +56,7 @@ class StartMenu(WorldState):
         text_font = pygame.font.Font(os.path.join(WORLD_ASSETS_DIR, 'freesansbold.ttf'), 20)
 
         # Title text render and add
-        text = large_text_font.render('ProCom Curriculum 2022', True, WorldState.BLUE, WorldState.BLACK)
+        text = large_text_font.render('ProCom Curriculum 2023', True, WorldState.BLUE, WorldState.BLACK)
         text_rect = text.get_rect()
         text_rect.center = (sr[0] // 2, sr[1] // 3)
         self._assets["title"] = (text, text_rect)
